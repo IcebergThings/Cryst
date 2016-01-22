@@ -1,5 +1,2 @@
-/frogimine.iso
-/isodir/
 *.o
 *.bin
-.*.swp

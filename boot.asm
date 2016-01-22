@@ -1,87 +1,67 @@
-; Multiboot的头
-; 参照Multiboot规范中“OS image format”一段：
-; https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#OS-image-format
-FLAGS equ 0b111 ; 对齐页面 + 提供memory map + 指定图像模式
-MULTIBOOT_MAGIC equ 0x1badb002 ; 魔法，参照Multiboot规范
-GRAPHICS_MODE equ 0 ; 线性图像模式（linear graphics mode）
-GRAPHICS_WIDTH equ 320 ; 分辨率（横向）
-GRAPHICS_HEIGHT equ 200 ; 分辨率（纵向）
-GRAPHICS_DEPTH equ 8 ; 色深
+MBOOT_HEADER_MAGIC 	equ 	0x1BADB002 	; Multiboot 魔数，由规范决定的
+
+MBOOT_PAGE_ALIGN 	equ 	1 << 0    	; 0 号位表示所有的引导模块将按页(4KB)边界对齐
+MBOOT_MEM_INFO 		equ 	1 << 1    	; 1 号位通过 Multiboot 信息结构的 mem_* 域包括可用内存的信息
+						; (告诉GRUB把内存空间的信息包含在Multiboot信息结构中)
+
+; 定义我们使用的 Multiboot 的标记
+MBOOT_HEADER_FLAGS 	equ 	MBOOT_PAGE_ALIGN | MBOOT_MEM_INFO
+
+; 域checksum是一个32位的无符号值，当与其他的magic域(也就是magic和flags)相加时，
+; 要求其结果必须是32位的无符号值 0 (即magic + flags + checksum = 0)
+MBOOT_CHECKSUM 		equ 	- (MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS)
+
+; 符合Multiboot规范的 OS 映象需要这样一个 magic Multiboot 头
+
+; Multiboot 头的分布必须如下表所示：
+; ----------------------------------------------------------
+; 偏移量  类型  域名        备注
+;
+;   0     u32   magic       必需
+;   4     u32   flags       必需 
+;   8     u32   checksum    必需 
+;
+; 我们只使用到这些就够了，更多的详细说明请参阅 GNU 相关文档
+;-----------------------------------------------------------
+
+;-----------------------------------------------------------------------------
+
+[BITS 32]  	; 所有代码以 32-bit 的方式编译
+
 section .multiboot
-align 4
-	dd MULTIBOOT_MAGIC
-	dd FLAGS
-	dd -(MULTIBOOT_MAGIC + FLAGS)
-	resd 5
-	dd GRAPHICS_MODE
-	dd GRAPHICS_WIDTH
-	dd GRAPHICS_HEIGHT
-	dd GRAPHICS_DEPTH
 
-; 分配堆栈所使用的空间
-section .bootstrap_stack, nobits
-align 4
-stack_bottom:
-resb 16384
-stack_top:
+; 在代码段的起始位置设置符合 Multiboot 规范的标记
 
-; 链接脚本指定了_start作为系统内核的入口点，所以引导程序在内核读完后会跳到这里
-; 执行。此函数无需返回，因为引导程序没了。
-section .text
-global _start
+dd MBOOT_HEADER_MAGIC 	; GRUB 会通过这个魔数判断该映像是否支持
+dd MBOOT_HEADER_FLAGS   ; GRUB 的一些加载时选项，其详细注释在定义处
+dd MBOOT_CHECKSUM       ; 检测数值，其含义在定义处
+
+[GLOBAL _start] 		; 内核代码入口，此处提供该声明给 ld 链接器
+[GLOBAL glb_mboot_ptr] 	; 全局的 struct multiboot * 变量
+[EXTERN kernel_main] 	; 声明内核 C 代码的入口函数
+
+section .text 			; 代码段从这里开始
+
 _start:
-	; ▼ 欢迎来到内核模式！
-	
-	; 创建自己的堆栈
-	mov esp, stack_top
-	
-	; 设置调色板
-	; 参照：http://wiki.osdev.org/VGA_Hardware#Port_0x3C8
-	pushfd
-	cli
-	mov dx, 0x03c9
-	mov al, 0
-	out 0x03c8, al
-	%macro color 3
-		mov al, %1 >> 2
-		out dx, al
-		mov al, %2 >> 2
-		out dx, al
-		mov al, %3 >> 2
-		out dx, al
-	%endmacro
-	; 调色板数据
-	; 由于内部使用的是0~63数据范围，因此即使在这里指定得很精确也毫无作用。
-	; 在这里用0~255的范围仅是为了方便处理而使用。
-	; 0~16：HTML规定的标准16色、Windows cmd.exe默认颜色等。可参照：
-	; https://www.w3.org/TR/REC-html40/types.html#idx-color
-	color 0, 0, 0
-	color 128, 0, 0
-	color 0, 128, 0
-	color 128, 128, 0
-	color 0, 0, 128
-	color 128, 0, 128
-	color 0, 128, 128
-	color 192, 192, 192
-	color 128, 128, 128
-	color 255, 0, 0
-	color 0, 255, 0
-	color 255, 255, 0
-	color 0, 0, 255
-	color 255, 0, 255
-	color 0, 255, 255
-	color 255, 255, 255
-	%unmacro color 3
-	popfd
-	
-	; 调用系统内核的主程序
-	extern kernel_main
-	call kernel_main
-	
-	; 当内核主程序返回后，就让电脑进入死循环
-	; 禁用中断
-	cli
-.loop:
-	; 等待到下一次中断来临
-	hlt
-	jmp .loop
+	cli  			 	; 此时还没有设置好保护模式的中断处理，要关闭中断
+				 		; 所以必须关闭中断
+	mov esp, STACK_TOP  ; 设置内核栈地址
+	mov ebp, 0 		 	; 帧指针修改为 0
+	and esp, 0FFFFFFF0H	 		; 栈地址按照16字节对齐
+	mov [glb_mboot_ptr], ebx 	; 将 ebx 中存储的指针存入全局变量
+	jmp kernel_main		 		; 调用内核入口函数
+stop:
+	hlt 			 	; 停机指令，什么也不做，可以降低 CPU 功耗
+	jmp stop 		 	; 到这里结束，关机什么的后面再说
+
+;-----------------------------------------------------------------------------
+
+section .bss 			; 未初始化的数据段从这里开始
+stack:
+	resb 32768 	 	 	; 这里作为内核栈
+glb_mboot_ptr: 			; 全局的 multiboot 结构体指针
+	resb 4
+
+STACK_TOP equ $-stack-1	; 内核栈顶，$ 符指代是当前地址
+
+;-----------------------------------------------------------------------------
