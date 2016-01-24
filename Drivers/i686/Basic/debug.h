@@ -21,28 +21,18 @@
 #define INCLUDE_DEBUG_H_
 
 #include "config.h"
+#include "StdC++/std.h"
 
 #ifdef X86DEBUG
 #define INTERFACE8024 0xb8000
 //---------------------------------------------------------------------------
 // ● X86 debug字符放置 (放入interface)
 //---------------------------------------------------------------------------
-void debugputchar(void* interface, char c) {
-	*((char*) interface) = c;
-}
-
+void debugputchar(void* interface, char c);
 //---------------------------------------------------------------------------
 // ● X86 debug字符串放置 (放入interface)
 //---------------------------------------------------------------------------
-void debugputstring(char* interface, char* st) {
-	uint32_t i = 0;
-	char* s = st;
-	while (*s) {
-		*(interface + i) = *s++;
-		*(interface + i + 1) = 0x3F;
-		i+=2;
-	}
-}
+void debugputstring(char* interface, char* st);
 #endif
 
 #endif

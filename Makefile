@@ -26,6 +26,7 @@ C_SOURCES = $(shell find . -name "*.cpp")
 C_OBJECTS = $(patsubst %.cpp, %.o, $(C_SOURCES))
 S_SOURCES = $(shell find . -name "*.asm")
 S_OBJECTS = $(patsubst %.asm, %.o, $(S_SOURCES))
+OBJECTS = $(C_OBJECTS) $(S_OBJECTS)
 
 C_FLAGS = -c -Wall -m32 -ggdb -nostdinc -fno-builtin -fno-stack-protector -IDrivers/${ARCH} -I./ -O2
 LD_FLAGS = -T scripts/linker.ld -m elf_i386 -no-builtin -nostdlib -O2
@@ -52,12 +53,14 @@ clean:
 	@echo 编译C++代码文件$<……
 	$(CC) $(C_FLAGS) $< -o $@
 
-${S_OBJECTS}: ${S_SOURCES}
-	@echo 编译NASM汇编文件$<……
-	nasm $(ASM_FLAGS) $<
-
 #----------------------------------------------------------------------------
 # ● 特定目标
 #----------------------------------------------------------------------------
-mine.bin: ${C_OBJECTS} ${S_OBJECTS}
+Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
+	nasm ${ASM_FLAGS} $^ -o $@
+
+Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
+	nasm ${ASM_FLAGS} $^ -o $@
+
+mine.bin: ${OBJECTS}
 	${CCLD} ${LD_FLAGS} -o mine.bin -O2 $^

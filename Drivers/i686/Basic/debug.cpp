@@ -12,55 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ kernel.cpp
+// ■ debug.cpp
 //-----------------------------------------------------------------------------
-//   这个文件是干什么的？
+//   Drivers > i686 > Basic > debug
 //=============================================================================
 
-#include "config.h"
-
-#include "Basic/types.h"
-#include "Basic/io.h"
-#include "Basic/memory.h"
-#include "Basic/idt.h"
-
-#include "StdC++/std.h"
-
-// 调试用
-#ifdef DEBUG
-#include "Basic/debug.h"
-#endif
+#include "debug.h"
 
 //---------------------------------------------------------------------------
-// ● Multiarch初始化
+// ● X86 debug字符放置 (放入interface)
 //---------------------------------------------------------------------------
-void arch_init () {
-	Memory mem = Memory();
-	IDT idt = IDT();
-	return;
+void debugputchar(void* interface, char c) {
+	*((char*) interface) = c;
 }
 
 //---------------------------------------------------------------------------
-// ● 内核IDLE
+// ● X86 debug字符串放置 (放入interface)
 //---------------------------------------------------------------------------
-void idle () {
-
-#ifdef DEBUG
-	debugputstring((char*) INTERFACE8024, (char*) "In Kernel ");
-#endif
-
-	IO io = IO();
-	for (;;) {
-		io.cpu_hlt ();	// 挂起
+void debugputstring(char* interface, char* st) {
+	uint32_t i = 0;
+	char* s = st;
+	while (*s) {
+		*(interface + i) = *s++;
+		*(interface + i + 1) = 0x3F;
+		i+=2;
 	}
-
-	return;
-}
-
-//---------------------------------------------------------------------------
-// ● 主程序
-//---------------------------------------------------------------------------
-extern "C" void kernel_main() {
-	arch_init ();
-	idle ();
 }
