@@ -35,15 +35,15 @@ ASM_FLAGS = -f elf32 -g -F stabs
 #----------------------------------------------------------------------------
 # ● 一般目标
 #----------------------------------------------------------------------------
-all: mine.bin
+all: ivik.bin
 run: all
-	qemu-system-i386 -kernel mine.bin
+	qemu-system-i386 -kernel ivik.bin
 debug: all
-	qemu-system-i386 -kernel mine.bin -gdb tcp::1234 -S &
-	sleep 1 # gdb要等qemu就绪
-	cgdb -x gdbinit
+	qemu-system-i386 -kernel ivik.bin -gdb tcp::1234 -S &
+	sleep 1 # GDB要等QEMU就绪
+	cgdb -x scripts/gdbinit
 clean:
-	rm -f ${C_OBJECTS} ${S_OBJECTS} mine.bin
+	rm -f ${C_OBJECTS} ${S_OBJECTS} ivik.bin
 .PHONY: all run clean
 
 #----------------------------------------------------------------------------
@@ -62,12 +62,11 @@ Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
 Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-mine.bin: ${OBJECTS}
-	${CCLD} ${LD_FLAGS} -o mine.bin -O2 $^
+ivik.bin: ${OBJECTS}
+	${CCLD} ${LD_FLAGS} -o ivik.bin -O2 $^
 
 #----------------------------------------------------------------------------
 # ● 最终目标
 #----------------------------------------------------------------------------
-build: mine.bin
-	strip mine.bin
-	mv mine.bin frogimine.bin
+build: ivik.bin
+	strip ivik.bin
