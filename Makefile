@@ -62,11 +62,11 @@ Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
 Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-ivik.bin: ${OBJECTS}
-	${CCLD} ${LD_FLAGS} -o ivik.bin -O2 $^
+Cryst.bin: ${OBJECTS}
+	${CCLD} ${LD_FLAGS} -o Cryst.bin -O2 $^
 
 #----------------------------------------------------------------------------
 # ● 最终目标
 #----------------------------------------------------------------------------
-build: ivik.bin
-	strip ivik.bin
+build: Cryst.bin
+	strip Cryst.bin
