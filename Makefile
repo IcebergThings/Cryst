@@ -35,15 +35,15 @@ ASM_FLAGS = -f elf32 -g -F stabs
 #----------------------------------------------------------------------------
 # ● 一般目标
 #----------------------------------------------------------------------------
-all: ivik.bin
+all: Cryst.bin
 run: all
-	qemu-system-i386 -kernel ivik.bin
+	qemu-system-i386 -kernel Cryst.bin
 debug: all
-	qemu-system-i386 -kernel ivik.bin -gdb tcp::1234 -S &
+	qemu-system-i386 -kernel Cryst.bin -gdb tcp::1234 -S &
 	sleep 1 # GDB要等QEMU就绪
 	cgdb -x scripts/gdbinit
 clean:
-	rm -f ${C_OBJECTS} ${S_OBJECTS} ivik.bin
+	rm -f ${C_OBJECTS} ${S_OBJECTS} Cryst.bin
 .PHONY: all run clean
 
 #----------------------------------------------------------------------------
