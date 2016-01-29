@@ -1,6 +1,6 @@
-iViK
+Cryst
 ====
 
-这里是iViK内核。
+这里是Cryst内核。
 
-参照：[项目Wiki](https://github.com/IcebergOS/iViK/wiki)。
+参照：[项目Wiki](https://github.com/IcebergOS/Cryst/wiki)。
