@@ -25,7 +25,7 @@
 #include "Basic/idt.h"
 #include "Basic/timer.h"
 
-#include "StdC++/std.h"
+#include "Basic/types.h"
 
 // 调试用
 #ifdef DEBUG

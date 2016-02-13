@@ -51,7 +51,6 @@ void Memory::ReleasePhy(uint32_t page) {
 //   这个函数建议只用来寻找16k以下的段，除非之后把段最大精度改成不是16kb。
 //---------------------------------------------------------------------------
 uint32_t Memory::SearchFree() {
-	uint32_t count = 0;
 	// 反正也用不了lower memory，直接跳过那部分
 	for(uint32_t i = 256; i <= page_count; i++) {
 		if (phy_c[i]==0) {

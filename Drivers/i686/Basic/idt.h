@@ -20,7 +20,7 @@
 #ifndef INCLUDE_IDT_H
 #define INCLUDE_IDT_H
 
-#include "StdC++/std.h"
+#include "types.h"
 #include "Basic/io.h"
 
 class IDT {
@@ -48,7 +48,7 @@ class IDT {
 	typedef struct pt_regs_t {
 		uint32_t ds;		// 用于保存用户的数据段描述符
 		uint32_t edi; 		// 从 edi 到 eax 由 pusha 指令压入
-		uint32_t esi; 
+		uint32_t esi;
 		uint32_t ebp;
 		uint32_t esp;
 		uint32_t ebx;
@@ -58,7 +58,7 @@ class IDT {
 		uint32_t int_no; 	// 中断号
 		uint32_t err_code;  // 错误代码(有中断错误代码的中断会由CPU压入)
 		uint32_t eip;		// 以下由处理器自动压入
-		uint32_t cs; 		
+		uint32_t cs;
 		uint32_t eflags;
 		uint32_t useresp;
 		uint32_t ss;
@@ -93,7 +93,7 @@ class IDT {
 // ● 注册一个中断处理函数
 //---------------------------------------------------------------------------
 void register_interrupt_handler(uint8_t n, IDT::interrupt_handler_t h);
-	
+
 extern "C" {
 	extern void idt_update(uint32_t ptr);
 	//---------------------------------------------------------------------------
@@ -101,25 +101,25 @@ extern "C" {
 	//---------------------------------------------------------------------------
 	// ISR:中断服务程序(interrupt service routine)
 	//---------------------------------------------------------------------------
-	extern void isr0(); 		// 0 #DE 除 0 异常 
-	extern void isr1(); 		// 1 #DB 调试异常 
-	extern void isr2(); 		// 2 NMI 
-	extern void isr3(); 		// 3 BP 断点异常 
-	extern void isr4(); 		// 4 #OF 溢出 
-	extern void isr5(); 		// 5 #BR 对数组的引用超出边界 
-	extern void isr6(); 		// 6 #UD 无效或未定义的操作码 
-	extern void isr7(); 		// 7 #NM 设备不可用(无数学协处理器) 
-	extern void isr8(); 		// 8 #DF 双重故障(有错误代码) 
-	extern void isr9(); 		// 9 协处理器跨段操作 
-	extern void isr10(); 		// 10 #TS 无效TSS(有错误代码) 
-	extern void isr11(); 		// 11 #NP 段不存在(有错误代码) 
-	extern void isr12(); 		// 12 #SS 栈错误(有错误代码) 
-	extern void isr13(); 		// 13 #GP 常规保护(有错误代码) 
-	extern void isr14(); 		// 14 #PF 页故障(有错误代码) 
-	extern void isr15(); 		// 15 CPU 保留 
-	extern void isr16(); 		// 16 #MF 浮点处理单元错误 
-	extern void isr17(); 		// 17 #AC 对齐检查 
-	extern void isr18(); 		// 18 #MC 机器检查 
+	extern void isr0(); 		// 0 #DE 除 0 异常
+	extern void isr1(); 		// 1 #DB 调试异常
+	extern void isr2(); 		// 2 NMI
+	extern void isr3(); 		// 3 BP 断点异常
+	extern void isr4(); 		// 4 #OF 溢出
+	extern void isr5(); 		// 5 #BR 对数组的引用超出边界
+	extern void isr6(); 		// 6 #UD 无效或未定义的操作码
+	extern void isr7(); 		// 7 #NM 设备不可用(无数学协处理器)
+	extern void isr8(); 		// 8 #DF 双重故障(有错误代码)
+	extern void isr9(); 		// 9 协处理器跨段操作
+	extern void isr10(); 		// 10 #TS 无效TSS(有错误代码)
+	extern void isr11(); 		// 11 #NP 段不存在(有错误代码)
+	extern void isr12(); 		// 12 #SS 栈错误(有错误代码)
+	extern void isr13(); 		// 13 #GP 常规保护(有错误代码)
+	extern void isr14(); 		// 14 #PF 页故障(有错误代码)
+	extern void isr15(); 		// 15 CPU 保留
+	extern void isr16(); 		// 16 #MF 浮点处理单元错误
+	extern void isr17(); 		// 17 #AC 对齐检查
+	extern void isr18(); 		// 18 #MC 机器检查
 	extern void isr19(); 		// 19 #XM SIMD(单指令多数据)浮点异常
 	//---------------------------------------------------------------------------
 	// 20-31 Intel 保留
@@ -196,5 +196,5 @@ extern "C" {
 // ● 中断处理函数的指针数组
 //---------------------------------------------------------------------------
 static IDT::interrupt_handler_t interrupt_handlers[256];
-	
+
 #endif

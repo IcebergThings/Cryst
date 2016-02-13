@@ -21,7 +21,7 @@
 #define INCLUDE_DEBUG_H_
 
 #include "config.h"
-#include "StdC++/std.h"
+#include "Basic/types.h"
 
 #ifdef X86DEBUG
 #define INTERFACE8024 0xb8000
