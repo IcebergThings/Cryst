@@ -26,7 +26,6 @@
 
 
 void irq_handler(IDT::pt_regs *regs) {
-	IO io = IO();
 #ifdef DEBUG
 	debugputstring((char*) INTERFACE8024, (char*) "IRQ! ");
 #endif
@@ -36,11 +35,11 @@ void irq_handler(IDT::pt_regs *regs) {
 	// 故大于等于 40 的中断号是由从片处理的
 	if (regs->int_no >= 40) {
 		// 发送重设信号给从片
-		io.out8(0xA0, 0x20);
+		IO::out8(0xA0, 0x20);
 	}
 	// 发送重设信号给主片
-	io.out8(0x20, 0x20);
-	
+	IO::out8(0x20, 0x20);
+
 	if (interrupt_handlers[regs->int_no]) {
 		interrupt_handlers[regs->int_no] (regs);
 	}
@@ -59,7 +58,7 @@ void isr_handler(IDT::pt_regs *regs)
 #endif
 	}
 }
-	
+
 //---------------------------------------------------------------------------
 // ● IDT门设定  （flag | 0x60为设置用户态）
 //---------------------------------------------------------------------------
@@ -144,49 +143,47 @@ void register_interrupt_handler(uint8_t n, IDT::interrupt_handler_t h) {
 // ● IDT初始化
 //---------------------------------------------------------------------------
 IDT::IDT() {
-	IO io = IO();
-
 	// 重新映射 IRQ 表
 	// 两片级联的 Intel 8259A 芯片
 	// 主片端口 0x20 0x21
 	// 从片端口 0xA0 0xA1
-	
+
 	// 初始化主片、从片
 	// 0001 0001
-	io.out8(0x20, 0x11);
-	io.out8(0xA0, 0x11);
+	IO::out8(0x20, 0x11);
+	IO::out8(0xA0, 0x11);
 
 	// 设置主片 IRQ 从 0x20(32) 号中断开始
-	io.out8(0x21, 0x20);
+	IO::out8(0x21, 0x20);
 
 	// 设置从片 IRQ 从 0x28(40) 号中断开始
-	io.out8(0xA1, 0x28);
-	
+	IO::out8(0xA1, 0x28);
+
 	// 设置主片 IR2 引脚连接从片
-	io.out8(0x21, 0x04);
+	IO::out8(0x21, 0x04);
 
 	// 告诉从片输出引脚和主片 IR2 号相连
-	io.out8(0xA1, 0x02);
-	
+	IO::out8(0xA1, 0x02);
+
 	// 设置主片和从片按照 8086 的方式工作
-	io.out8(0x21, 0x01);
-	io.out8(0xA1, 0x01);
-	
+	IO::out8(0x21, 0x01);
+	IO::out8(0xA1, 0x01);
+
 	// 设置主从片允许中断
-	io.out8(0x21, 0x0);
-	io.out8(0xA1, 0x0);
+	IO::out8(0x21, 0x0);
+	IO::out8(0xA1, 0x0);
 
 	//fillchar((uint8_t*)interrupt_handlers, sizeof(interrupt_handler_t) * 256, 0x00);
 	//fillchar((uint8_t*)idt_entries, sizeof(idt_entry_t) * 256, 0x00);
-	
+
 	idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
 	idt_ptr.base = (uint32_t)&idt_entries;
-	
+
 	idt_set_gates();
-	
+
 	// 更新芯片中IDT表
 	idt_update((uint32_t)&idt_ptr);
-	
+
 	// 打开中断
-	io.sti();
+	IO::sti();
 }

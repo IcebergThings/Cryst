@@ -32,8 +32,6 @@ static void timer_callback(IDT::pt_regs *regs) {
 // ● 时钟初始化
 //---------------------------------------------------------------------------
 Timer::Timer(uint32_t frequency) {
-	IO io = IO();
-	
 	// 注册时间相关的处理函数
 	register_interrupt_handler(IRQ0, timer_callback);
 
@@ -45,13 +43,13 @@ Timer::Timer(uint32_t frequency) {
 	// 0  0  1  1  0  1  1  0
 	// 即就是 36 H
 	// 设置 8253/8254 芯片工作在模式 3 下
-	io.out8(0x43, 0x36);
+	IO::out8(0x43, 0x36);
 
 	// 拆分低字节和高字节
 	uint8_t low = (uint8_t)(divisor & 0xFF);
 	uint8_t hign = (uint8_t)((divisor >> 8) & 0xFF);
-	
+
 	// 分别写入低字节和高字节
-	io.out8(0x40, low);
-	io.out8(0x40, hign);
+	IO::out8(0x40, low);
+	IO::out8(0x40, hign);
 }
