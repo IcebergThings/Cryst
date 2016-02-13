@@ -51,9 +51,8 @@ void idle () {
 	debugputstring((char*) INTERFACE8024, (char*) "In Kernel ");
 #endif
 
-	IO io = IO();
 	for (;;) {
-		io.cpu_hlt ();	// 挂起
+		IO::cpu_hlt ();	// 挂起
 	}
 
 	return;
