@@ -35,15 +35,15 @@ ASM_FLAGS = -f elf32 -g -F stabs
 #----------------------------------------------------------------------------
 # ● 一般目标
 #----------------------------------------------------------------------------
-all: ivik.bin
+all: Cryst.bin
 run: all
-	qemu-system-i386 -kernel ivik.bin
+	qemu-system-i386 -kernel Cryst.bin
 debug: all
-	qemu-system-i386 -kernel ivik.bin -gdb tcp::1234 -S &
+	qemu-system-i386 -kernel Cryst.bin -gdb tcp::1234 -S &
 	sleep 1 # GDB要等QEMU就绪
 	cgdb -x scripts/gdbinit
 clean:
-	rm -f ${C_OBJECTS} ${S_OBJECTS} ivik.bin
+	rm -f ${C_OBJECTS} ${S_OBJECTS} Cryst.bin
 .PHONY: all run clean
 
 #----------------------------------------------------------------------------
@@ -62,11 +62,11 @@ Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
 Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-ivik.bin: ${OBJECTS}
-	${CCLD} ${LD_FLAGS} -o ivik.bin -O2 $^
+Cryst.bin: ${OBJECTS}
+	${CCLD} ${LD_FLAGS} -o Cryst.bin -O2 $^
 
 #----------------------------------------------------------------------------
 # ● 最终目标
 #----------------------------------------------------------------------------
-build: ivik.bin
-	strip ivik.bin
+build: Cryst.bin
+	strip Cryst.bin
