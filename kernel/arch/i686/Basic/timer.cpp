@@ -22,16 +22,22 @@
 //---------------------------------------------------------------------------
 // ● 时钟信号处理函数
 //---------------------------------------------------------------------------
+static RS232 serial;
+static uint64_t tick = 0;
 static void timer_callback(IDT::pt_regs *regs) {
+	tick++;
 #ifdef DEBUG
+	serial.write_serial('T');
 	debugputstring((char*) INTERFACE8024, (char*) "Timer Call back ");
 #endif
 }
+
 
 //---------------------------------------------------------------------------
 // ● 时钟初始化
 //---------------------------------------------------------------------------
 Timer::Timer(uint32_t frequency) {
+
 	// 注册时间相关的处理函数
 	register_interrupt_handler(IRQ0, timer_callback);
 

@@ -29,19 +29,36 @@
 
 // 调试用
 #ifdef DEBUG
+
 #include "Basic/debug.h"
+#include "Device/RS232.h"
+
 #endif
+
 
 //---------------------------------------------------------------------------
 // ● Multiarch初始化
 //---------------------------------------------------------------------------
 void arch_init () {
 	Memory mem = Memory();
+	//mem_p = &mem;
 	IDT idt = IDT();
+	//idt_p = &idt;
 	Timer timer = Timer(200);
+	//timer_p = &timer;
+#ifdef DEBUG
+
+	//serial_p = &serial;
+#endif
 	return;
 }
-
+/*
+#ifdef DEBUG
+RS232* get_serial() {
+	return serial_p;
+}
+#endif
+*/
 //---------------------------------------------------------------------------
 // ● 内核IDLE
 //---------------------------------------------------------------------------

@@ -18,7 +18,7 @@
 #----------------------------------------------------------------------------
 # ● 定义变量
 #----------------------------------------------------------------------------
-CC=clang++ -m32
+CC=gcc -m32
 CCLD=ld -melf_i386
 ARCH=i686
 
@@ -28,7 +28,7 @@ S_SOURCES = $(shell find . -name "*.asm")
 S_OBJECTS = $(patsubst %.asm, %.o, $(S_SOURCES))
 OBJECTS = $(C_OBJECTS) $(S_OBJECTS)
 
-C_FLAGS = -c -Wall -m32 -ggdb -nostdinc -fno-builtin -fno-stack-protector -IDrivers/${ARCH} -I./ -O2
+C_FLAGS = -c -Wall -m32 -ggdb -nostdinc -fno-builtin -fno-stack-protector -Ikernel/arch/${ARCH} -I./kernel/ -O2
 LD_FLAGS = -T scripts/linker.ld -m elf_i386 -no-builtin -nostdlib -O4
 ASM_FLAGS = -f elf32 -g -F stabs
 
@@ -56,10 +56,10 @@ clean:
 #----------------------------------------------------------------------------
 # ● 特定目标
 #----------------------------------------------------------------------------
-Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
+kernel/arch/${ARCH}/Boot/boot.o: kernel/arch/${ARCH}/Boot/boot.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
+kernel/arch/${ARCH}/Basic/KFunc.o: kernel/arch/${ARCH}/Basic/KFunc.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
 Cryst.bin: ${OBJECTS}

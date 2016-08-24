@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ Timer.h
+// ■ RS232.h
 //-----------------------------------------------------------------------------
-//   i686基础驱动：Timer。
+//   i686设备驱动：RS232串口。
 //=============================================================================
 
-#ifndef INCLUDE_TIMER_H
-#define INCLUDE_TIMER_H
+#include "config.h"
+
+#ifndef INCLUDE_I686_RS232_H
+#define INCLUDE_I686_RS232_H
 
 #include "Basic/idt.h"
 #include "Basic/io.h"
@@ -28,12 +30,20 @@
 #include "Basic/debug.h"
 #endif
 
-class Timer {
-	public:
+#define PORT 0x3f8   /* COM1 */
+
+class RS232 {
+
+private:
+	void init_serial();
+	int is_transmit_empty();
+
+public:
+	void write_serial(char a);
 	//---------------------------------------------------------------------------
-	// ● 时钟初始化
+	// ● 初始化
 	//---------------------------------------------------------------------------
-	Timer(uint32_t frequency);
+	RS232();
 };
 
 #endif
