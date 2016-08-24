@@ -28,7 +28,7 @@ SECTIONS
 	.stabstr :
 	{
 		*(.stabstr)
-	 	. = ALIGN(4096);
+		. = ALIGN(4096);
 	}
 	
 	/DISCARD/ : { *(.comment) *(.eh_frame) }
