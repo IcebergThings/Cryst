@@ -35,7 +35,7 @@ int RS232_is_transmit_empty(RS232_t* device) {
 }
 
 void RS232_write_serial(RS232_t* device, char a) {
-   while (RS232_is_transmit_empty() == 0);
+   while (RS232_is_transmit_empty(device) == 0);
 
    io_out8(device->port,a);
 }

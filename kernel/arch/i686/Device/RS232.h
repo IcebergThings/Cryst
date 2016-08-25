@@ -26,18 +26,14 @@
 #include "Basic/io.h"
 #include "config.h"
 
-#ifdef DEBUG
-#include "Basic/debug.h"
-#endif
-
 #define COM1 0x3f8
 
-typedef _RS232_t {
+typedef struct _RS232_t {
 	uint16_t port;
 } RS232_t;
 
-int is_transmit_empty(RS232_t* device);
-void write_serial(RS232_t* device, char a);
+int RS232_is_transmit_empty(RS232_t* device);
+void RS232_write_serial(RS232_t* device, char a);
 //---------------------------------------------------------------------------
 // ● 初始化
 //---------------------------------------------------------------------------

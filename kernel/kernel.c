@@ -25,7 +25,7 @@
 #include "Basic/idt.h"
 #include "Basic/timer.h"
 
-#include "StdC++/std.h"
+#include "Basic/types.h"
 
 // 调试用
 #ifdef DEBUG
@@ -37,12 +37,14 @@
 // ● Multiarch初始化
 //---------------------------------------------------------------------------
 void arch_init () {
+	#ifdef DEBUG
+		Init_Debug();
+		kputs("In Kernel\r\n");
+	#endif
+
 	Init_Memory();
 	Init_IDT();
 	Init_Timer(200);
-#ifdef DEBUG
-	Init_Debug();
-#endif
 	return;
 }
 
@@ -51,12 +53,8 @@ void arch_init () {
 //---------------------------------------------------------------------------
 void idle () {
 
-#ifdef DEBUG
-	kputs((char*) INTERFACE8024, (char*) "In Kernel\n");
-#endif
-
 	for (;;) {
-		IO_cpu_hlt ();	// 挂起
+		io_cpu_hlt ();	// 挂起
 	}
 
 	return;

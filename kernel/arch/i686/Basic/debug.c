@@ -22,17 +22,17 @@
 RS232_t serial_debug;
 
 void kputc(char c) {
-	RS232_write_serial(c);
+	RS232_write_serial(&serial_debug, c);
 }
 
 void kputs(char* st) {
 	char* s = st;
-	while (*s) debugputchar(*s++);
+	while (*s) kputc(*s++);
 }
 
 //---------------------------------------------------------------------------
 // ● X86 debug初始化
 //---------------------------------------------------------------------------
 void Init_Debug() {
-	Init_RS232(serial_debug, COM1);
+	Init_RS232(&serial_debug, COM1);
 }

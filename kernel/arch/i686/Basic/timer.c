@@ -22,9 +22,8 @@
 //---------------------------------------------------------------------------
 // ● 时钟信号处理函数
 //---------------------------------------------------------------------------
-static RS232 serial;
 static uint64_t tick = 0;
-static void timer_callback(IDT::pt_regs *regs) {
+static void timer_callback(pt_regs *regs) {
 	tick++;
 #ifdef DEBUG
 	kputc('T');
@@ -35,10 +34,10 @@ static void timer_callback(IDT::pt_regs *regs) {
 //---------------------------------------------------------------------------
 // ● 时钟初始化
 //---------------------------------------------------------------------------
-Init_Timer(uint32_t frequency) {
+void Init_Timer(uint32_t frequency) {
 
 	// 注册时间相关的处理函数
-	register_interrupt_handler(IRQ0, timer_callback);
+	idt_register_interrupt_handler(IRQ0, timer_callback);
 
 	// Intel 8253/8254 PIT芯片 I/O端口地址范围是40h~43h
 	// 输入频率为 1193180 (12MHz)，frequency 即每秒中断次数

@@ -37,8 +37,8 @@ MBOOT_CHECKSUM 		equ 	- (MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS)
 ; 偏移量  类型  域名        备注
 ;
 ;   0     u32   magic       必需
-;   4     u32   flags       必需 
-;   8     u32   checksum    必需 
+;   4     u32   flags       必需
+;   8     u32   checksum    必需
 ;
 ; 我们只使用到这些就够了，更多的详细说明请参阅 GNU 相关文档
 ;-----------------------------------------------------------
@@ -69,9 +69,6 @@ _start:
 	and esp, 0FFFFFFF0H	 		; 栈地址按照16字节对齐
 	mov [glb_mboot_ptr], ebx 	; 将 ebx 中存储的指针存入全局变量
 	jmp kernel_main		 		; 调用内核入口函数
-stop:
-	hlt 			 	; 停机指令，什么也不做，可以降低 CPU 功耗
-	jmp stop 		 	; 到这里结束，关机什么的后面再说
 
 ;-----------------------------------------------------------------------------
 

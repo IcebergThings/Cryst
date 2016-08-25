@@ -24,9 +24,13 @@
 	#define NULL 0
 #endif
 
-#ifndef TRUE
-	#define TRUE  1
-	#define FALSE 0
+#ifndef true
+	#define true  1
+	#define false 0
+#endif
+
+#ifndef bool
+	#define bool int8_t
 #endif
 
 typedef unsigned long  uint64_t;
