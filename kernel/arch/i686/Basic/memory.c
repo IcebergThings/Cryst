@@ -19,6 +19,8 @@
 
 #include "Basic/memory.h"
 
+extern int KERNEL_CODE_END; // From linker.ld
+
 //---------------------------------------------------------------------------
 // ● 页表&页目录
 //---------------------------------------------------------------------------
@@ -59,7 +61,6 @@ void Memory_ReleasePhy(uint32_t page) {
 //   这个函数建议只用来寻找16k以下的段，除非之后把段最大精度改成不是16kb。
 //---------------------------------------------------------------------------
 uint32_t Memory_SearchFree() {
-	uint32_t count = 0;
 	// 反正也用不了lower memory，直接跳过那部分
 	for(uint32_t i = 256; i <= page_count; i++) {
 		if (phy_c[i]==0) {
@@ -88,9 +89,11 @@ void Init_Memory () {
 
 	// 初始操作
 	upper_mem = glb_mboot_ptr->mem_upper;
-	mem_size = upper_mem + 1024;
+	mem_size = upper_mem + 1024; // Upper memory + Lower (1024KB)
 	page_count = mem_size >> 2;
-	phy_c = (uint8_t*)0x120000;
+	int kernel_end_page = (uint32_t)(&KERNEL_CODE_END) >> 12;
+	int kernel_memory_end_page = kernel_end_page + (page_count >> 12 ) + 1;
+	phy_c = (uint8_t*) &KERNEL_CODE_END;
 
 	// 初始分页
 	// 将每个entry设置为not present
@@ -111,14 +114,14 @@ void Init_Memory () {
 	// holds the physical address where we want to start mapping these pages to.
 	// in this case, we want to map these pages to the very beginning of memory.
 	// we will fill 512 entries in the table, mapping 1.5 megabytes
-	// (lower memory 1M, kernel 128KByte, rest are for phy alloc)
-	for(uint32_t i = 1; i < (256 + 32 + (page_count >> 12 ) + 1); i++) {
-		// 第一页不映射，这样能捕捉NULL指针
+	// (lower memory 1M, kernel space and phy alloc space)
+	// 第一页不映射，这样能捕捉NULL指针
+	for(uint32_t i = 1; i < kernel_memory_end_page; i++) {
 		// As the address is page aligned, it will always leave 12 bits zeroed.
 		// Those bits are used by the attributes ;)
 		kern_page_table[i] = (i << 12) | SL_RW_P;
 	}
-	for(uint32_t i = 0; i < 256 + 32 + (page_count >> 12) + 1; i++) {
+	for(uint32_t i = 0; i < kernel_memory_end_page; i++) {
 		phy_c[i] = 0;
 	}
 

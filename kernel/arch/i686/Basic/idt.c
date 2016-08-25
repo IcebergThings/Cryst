@@ -57,13 +57,14 @@ void irq_handler(pt_regs *regs) {
 void isr_handler(pt_regs *regs)
 {
 	if (interrupt_handlers[regs->int_no]) {
-#ifdef DEBUG
-		kputs("ISR!\r\n");
-#endif
 		interrupt_handlers[regs->int_no] (regs);
 	} else {
 #ifdef DEBUG
-		kputs((char*) "Unhandled interrupt!\r\n");
+		kputs("Unhandled interrupt! ID: ");
+		char buf[4];
+		itoa(regs->int_no, buf, 10);
+		kputs(buf);
+		kputs("\r\n");
 #endif
 	}
 }
@@ -137,8 +138,8 @@ void idt_set_gates()
 	idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
 	idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
 
-	// 180 将来用于实现系统调用
-	idt_set_gate(180, (uint32_t)isr180, 0x08, 0x8E);
+	// 0x60 将来用于实现系统调用
+	idt_set_gate(0x60, (uint32_t)isr0x60, 0x08, 0x8E);
 }
 
 //---------------------------------------------------------------------------
@@ -181,9 +182,6 @@ void Init_IDT() {
 	// 设置主从片允许中断
 	io_out8(0x21, 0x0);
 	io_out8(0xA1, 0x0);
-
-	//fillchar((uint8_t*)interrupt_handlers, sizeof(interrupt_handler_t) * 256, 0x00);
-	//fillchar((uint8_t*)idt_entries, sizeof(idt_entry_t) * 256, 0x00);
 
 	idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
 	idt_ptr.base = (uint32_t)&idt_entries;

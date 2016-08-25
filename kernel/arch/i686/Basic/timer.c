@@ -23,31 +23,30 @@
 // ● 时钟信号处理函数
 //---------------------------------------------------------------------------
 static uint64_t tick = 0;
+static double sec_from_boot = 0;
+uint32_t timer_frequency = 0;
 static void timer_callback(pt_regs *regs) {
 	tick++;
+	//sec_from_boot += 1.0 / (double)timer_frequency;
+	//if(sec_from_boot > 5.0) {
+	//	Timer_set_frequency(10);
+	//}
 #ifdef DEBUG
-	kputc('T');
+	/*kputs((char*) "[Tick : ");
+	char buf[32];
+	itoa(tick, buf, 10);
+	kputs(buf);
+	kputs("]\r\n");*/
 #endif
 }
 
-
-//---------------------------------------------------------------------------
-// ● 时钟初始化
-//---------------------------------------------------------------------------
-void Init_Timer(uint32_t frequency) {
-
-	// 注册时间相关的处理函数
-	idt_register_interrupt_handler(IRQ0, timer_callback);
+void Timer_set_frequency(uint32_t frequency) {
+	io_cli();
 
 	// Intel 8253/8254 PIT芯片 I/O端口地址范围是40h~43h
 	// 输入频率为 1193180 (12MHz)，frequency 即每秒中断次数
 	uint32_t divisor = 1193180 / frequency;
-
-	// D7 D6 D5 D4 D3 D2 D1 D0
-	// 0  0  1  1  0  1  1  0
-	// 即就是 36 H
-	// 设置 8253/8254 芯片工作在模式 3 下
-	io_out8(0x43, 0x36);
+	timer_frequency = frequency;
 
 	// 拆分低字节和高字节
 	uint8_t low = (uint8_t)(divisor & 0xFF);
@@ -56,4 +55,22 @@ void Init_Timer(uint32_t frequency) {
 	// 分别写入低字节和高字节
 	io_out8(0x40, low);
 	io_out8(0x40, hign);
+
+	io_sti();
+}
+
+//---------------------------------------------------------------------------
+// ● 时钟初始化
+//---------------------------------------------------------------------------
+void Init_Timer(uint32_t frequency) {
+	// 注册时间相关的处理函数
+	idt_register_interrupt_handler(IRQ0, timer_callback);
+
+	// D7 D6 D5 D4 D3 D2 D1 D0
+	// 0  0  1  1  0  1  1  0
+	// 即就是 36 H
+	// 设置 8253/8254 芯片工作在模式 3 下
+	io_out8(0x43, 0x36);
+
+	Timer_set_frequency(frequency);
 }
