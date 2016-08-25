@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "Basic/types.h"
+#include "klib/string.h"
 #include "Device/RS232.h"
 
 #ifdef X86DEBUG
@@ -30,6 +31,7 @@ extern RS232_t debug_serial;
 
 void kputc(char c);
 void kputs(char* st);
+void kprintln(char* format, ...);
 //---------------------------------------------------------------------------
 // ● X86 debug初始化
 //---------------------------------------------------------------------------

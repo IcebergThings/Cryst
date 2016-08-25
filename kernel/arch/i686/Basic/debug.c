@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ debug.cpp
+// ■ debug.c
 //-----------------------------------------------------------------------------
 //   Drivers > i686 > Basic > debug
 //=============================================================================
@@ -28,6 +28,31 @@ void kputc(char c) {
 void kputs(char* st) {
 	char* s = st;
 	while (*s) kputc(*s++);
+}
+
+void kprintln(char* format, ...) {
+	#warning KPRINTLN BROKEN
+	uint8_t *varg = (uint8_t*)(&format);
+	//varg += 2;
+	while (*format) {
+		if (*format == '%') {
+			format++;
+			if (*format == 's') {
+				kputs(*((char**)varg));
+				varg += sizeof(char);
+			} else if (*format == 'd') {
+				char buf[64];
+				itoa((uint32_t) *((uint32_t*)varg), buf, 10);
+				kputs(buf);
+				varg += sizeof(int);
+			}
+
+		} else {
+			kputc(*format);
+		}
+		format++;
+	}
+	kputs("\r\n");
 }
 
 //---------------------------------------------------------------------------
