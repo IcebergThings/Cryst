@@ -72,10 +72,10 @@ _start:
 
 ;-----------------------------------------------------------------------------
 
-section .bss 			; 未初始化的数据段从这里开始
+section .bss			; 未初始化的数据段从这里开始
 stack:
-	resb 32768 	 	 	; 这里作为内核栈
-glb_mboot_ptr: 			; 全局的 multiboot 结构体指针
+	resb 32768			; 这里作为内核栈
+glb_mboot_ptr:		; 全局的 multiboot 结构体指针
 	resb 4
 
 STACK_TOP equ $-stack-1	; 内核栈顶，$ 符指代是当前地址

@@ -23,6 +23,7 @@
 #include "Basic/io.h"
 #include "Basic/memory.h"
 #include "Basic/idt.h"
+#include "Basic/safe.h"
 #include "Basic/timer.h"
 
 #include "Basic/types.h"
@@ -43,8 +44,21 @@ void arch_init () {
 	#endif
 
 	Init_Memory();
+	#ifdef DEBUG
+		kputs("Memory Initialized\r\n");
+	#endif
 	Init_IDT();
+	#ifdef DEBUG
+		kputs("IDT Initialized\r\n");
+	#endif
+	Init_Safe();
+	#ifdef DEBUG
+		kputs("Safe Module Initialized\r\n");
+	#endif
 	Init_Timer(200);
+	#ifdef DEBUG
+		kputs("Timer Initialized\r\n");
+	#endif
 	return;
 }
 
@@ -52,7 +66,7 @@ void arch_init () {
 // ● 内核IDLE
 //---------------------------------------------------------------------------
 void idle () {
-
+	asm volatile ("UD2");
 	for (;;) {
 		io_cpu_hlt ();	// 挂起
 	}
