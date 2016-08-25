@@ -30,7 +30,9 @@ SECTIONS
 		*(.stabstr)
 		. = ALIGN(4096);
 	}
-	
+
+	. = ALIGN(4096);
+	KERNEL_CODE_END = .;
+
 	/DISCARD/ : { *(.comment) *(.eh_frame) }
 }
-
