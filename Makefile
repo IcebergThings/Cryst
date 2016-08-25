@@ -22,8 +22,8 @@ CC=gcc -m32
 CCLD=ld -melf_i386
 ARCH=i686
 
-C_SOURCES = $(shell find . -name "*.cpp")
-C_OBJECTS = $(patsubst %.cpp, %.o, $(C_SOURCES))
+C_SOURCES = $(shell find . -name "*.c")
+C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
 S_SOURCES = $(shell find . -name "*.asm")
 S_OBJECTS = $(patsubst %.asm, %.o, $(S_SOURCES))
 OBJECTS = $(C_OBJECTS) $(S_OBJECTS)

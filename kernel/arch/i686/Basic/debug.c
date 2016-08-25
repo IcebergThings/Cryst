@@ -12,16 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ Process.cpp
+// ■ debug.cpp
 //-----------------------------------------------------------------------------
-//   i686基础驱动：Process。
+//   Drivers > i686 > Basic > debug
 //=============================================================================
 
-#ifndef INCLUDE_PROCESS_H
-#define INCLUDE_PROCESS_H
+#include "debug.h"
 
-class Process { // 注意：是进程管理器不是进程！
+RS232_t serial_debug;
 
+void kputc(char c) {
+	RS232_write_serial(c);
 }
 
-#endif
+void kputs(char* st) {
+	char* s = st;
+	while (*s) debugputchar(*s++);
+}
+
+//---------------------------------------------------------------------------
+// ● X86 debug初始化
+//---------------------------------------------------------------------------
+void Init_Debug() {
+	Init_RS232(serial_debug, COM1);
+}

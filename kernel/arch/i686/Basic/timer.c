@@ -27,8 +27,7 @@ static uint64_t tick = 0;
 static void timer_callback(IDT::pt_regs *regs) {
 	tick++;
 #ifdef DEBUG
-	serial.write_serial('T');
-	debugputstring((char*) INTERFACE8024, (char*) "Timer Call back ");
+	kputc('T');
 #endif
 }
 
@@ -36,7 +35,7 @@ static void timer_callback(IDT::pt_regs *regs) {
 //---------------------------------------------------------------------------
 // ● 时钟初始化
 //---------------------------------------------------------------------------
-Timer::Timer(uint32_t frequency) {
+Init_Timer(uint32_t frequency) {
 
 	// 注册时间相关的处理函数
 	register_interrupt_handler(IRQ0, timer_callback);
@@ -49,13 +48,13 @@ Timer::Timer(uint32_t frequency) {
 	// 0  0  1  1  0  1  1  0
 	// 即就是 36 H
 	// 设置 8253/8254 芯片工作在模式 3 下
-	IO::out8(0x43, 0x36);
+	io_out8(0x43, 0x36);
 
 	// 拆分低字节和高字节
 	uint8_t low = (uint8_t)(divisor & 0xFF);
 	uint8_t hign = (uint8_t)((divisor >> 8) & 0xFF);
 
 	// 分别写入低字节和高字节
-	IO::out8(0x40, low);
-	IO::out8(0x40, hign);
+	io_out8(0x40, low);
+	io_out8(0x40, hign);
 }

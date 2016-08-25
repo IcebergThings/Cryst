@@ -12,73 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ kernel.cpp
+// ■ io.c
 //-----------------------------------------------------------------------------
-//   这个文件是干什么的？
+//   i686基础驱动：IO。
 //=============================================================================
 
-#include "config.h"
-
-#include "Basic/types.h"
-#include "Basic/io.h"
-#include "Basic/memory.h"
-#include "Basic/idt.h"
-#include "Basic/timer.h"
-
-#include "StdC++/std.h"
-
-// 调试用
-#ifdef DEBUG
-
-#include "Basic/debug.h"
-#include "Device/RS232.h"
-
-#endif
-
+#include "io.h"
 
 //---------------------------------------------------------------------------
-// ● Multiarch初始化
+// ● CPU 挂起
 //---------------------------------------------------------------------------
-void arch_init () {
-	Memory mem = Memory();
-	//mem_p = &mem;
-	IDT idt = IDT();
-	//idt_p = &idt;
-	Timer timer = Timer(200);
-	//timer_p = &timer;
-#ifdef DEBUG
-
-	//serial_p = &serial;
-#endif
-	return;
-}
-/*
-#ifdef DEBUG
-RS232* get_serial() {
-	return serial_p;
-}
-#endif
-*/
-//---------------------------------------------------------------------------
-// ● 内核IDLE
-//---------------------------------------------------------------------------
-void idle () {
-
-#ifdef DEBUG
-	debugputstring((char*) INTERFACE8024, (char*) "In Kernel ");
-#endif
-
-	for (;;) {
-		IO::cpu_hlt ();	// 挂起
-	}
-
-	return;
+void io_cpu_hlt () {
+	asm volatile ("hlt");
 }
 
 //---------------------------------------------------------------------------
-// ● 主程序
+// ● 向端口写8位数据
 //---------------------------------------------------------------------------
-extern "C" void kernel_main() {
-	arch_init ();
-	idle ();
+void io_out8(uint16_t port, uint8_t value) {
+	asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
+}
+
+//---------------------------------------------------------------------------
+// ● 从端口读8位数据
+//---------------------------------------------------------------------------
+uint8_t io_in8(uint16_t port) {
+	uint8_t ret;
+
+	asm volatile("inb %1, %0" : "=a" (ret) : "dN" (port));
+
+	return ret;
+}
+
+//---------------------------------------------------------------------------
+// ● 打开中断
+//---------------------------------------------------------------------------
+void io_sti() {
+	asm volatile ("sti");
+}
+
+//---------------------------------------------------------------------------
+// ● 关闭中断
+//---------------------------------------------------------------------------
+void io_cli() {
+	asm volatile ("cli");
 }

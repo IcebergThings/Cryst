@@ -21,18 +21,19 @@
 #define INCLUDE_DEBUG_H_
 
 #include "config.h"
-#include "StdC++/std.h"
+#include "Basic/types.h"
+#include "Device/RS232.h"
 
 #ifdef X86DEBUG
-#define INTERFACE8024 0xb8000
-//---------------------------------------------------------------------------
-// ● X86 debug字符放置 (放入interface)
-//---------------------------------------------------------------------------
-void debugputchar(void* interface, char c);
-//---------------------------------------------------------------------------
-// ● X86 debug字符串放置 (放入interface)
-//---------------------------------------------------------------------------
-void debugputstring(char* interface, char* st);
-#endif
 
+extern RS232_t debug_serial;
+
+void kputc(char c);
+void kputs(char* st);
+//---------------------------------------------------------------------------
+// ● X86 debug初始化
+//---------------------------------------------------------------------------
+void Init_Debug();
+
+#endif
 #endif

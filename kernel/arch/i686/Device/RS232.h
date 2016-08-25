@@ -30,20 +30,17 @@
 #include "Basic/debug.h"
 #endif
 
-#define PORT 0x3f8   /* COM1 */
+#define COM1 0x3f8
 
-class RS232 {
+typedef _RS232_t {
+	uint16_t port;
+} RS232_t;
 
-private:
-	void init_serial();
-	int is_transmit_empty();
-
-public:
-	void write_serial(char a);
-	//---------------------------------------------------------------------------
-	// ● 初始化
-	//---------------------------------------------------------------------------
-	RS232();
-};
+int is_transmit_empty(RS232_t* device);
+void write_serial(RS232_t* device, char a);
+//---------------------------------------------------------------------------
+// ● 初始化
+//---------------------------------------------------------------------------
+void Init_RS232(RS232_t* device, uint16_t);
 
 #endif

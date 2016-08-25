@@ -20,16 +20,24 @@
 #include "Basic/memory.h"
 
 //---------------------------------------------------------------------------
+// ● 页表&页目录
+//---------------------------------------------------------------------------
+uint32_t volatile page_directory[1024] __attribute__((aligned(4096)));
+uint32_t volatile kern_page_table[1024] __attribute__((aligned(4096)));
+uint32_t mem_size, upper_mem, page_count;
+uint8_t volatile *phy_c;
+
+//---------------------------------------------------------------------------
 // ● 将页表绑定入页目录
 //---------------------------------------------------------------------------
-void Memory::map_pages_to_dir(int page_id, uint32_t* page_tab, uint8_t flag) {
+void Memory_map_pages_to_dir(int page_id, uint32_t* page_tab, uint8_t flag) {
 	page_directory[page_id] = ((uint32_t)page_tab) | flag;
 }
 
 //---------------------------------------------------------------------------
 // ● 占有物理内存（页计数）
 //---------------------------------------------------------------------------
-bool Memory::AllocPhy(uint32_t page) {
+bool Memory_AllocPhy(uint32_t page) {
 	if (phy_c[page] != 0) {
 		return false;
 	} else {
@@ -41,7 +49,7 @@ bool Memory::AllocPhy(uint32_t page) {
 //---------------------------------------------------------------------------
 // ● 释放物理内存（页计数）
 //---------------------------------------------------------------------------
-void Memory::ReleasePhy(uint32_t page) {
+void Memory_ReleasePhy(uint32_t page) {
 	phy_c[page] = 0;
 }
 
@@ -50,7 +58,7 @@ void Memory::ReleasePhy(uint32_t page) {
 //   返回空闲内存区起点，0为未找到。
 //   这个函数建议只用来寻找16k以下的段，除非之后把段最大精度改成不是16kb。
 //---------------------------------------------------------------------------
-uint32_t Memory::SearchFree() {
+uint32_t Memory_SearchFree() {
 	uint32_t count = 0;
 	// 反正也用不了lower memory，直接跳过那部分
 	for(uint32_t i = 256; i <= page_count; i++) {
@@ -64,10 +72,10 @@ uint32_t Memory::SearchFree() {
 //---------------------------------------------------------------------------
 // ● 将内存绑定入页表（页计数）
 //---------------------------------------------------------------------------
-void Memory::map_physical_to_page_tab(uint32_t* page_tab, uint8_t flag, uint32_t f, uint32_t t) {
+void Memory_map_physical_to_page_tab(uint32_t* page_tab, uint8_t flag, uint32_t f, uint32_t t) {
 	for(uint32_t i = f; i < t; i++) {
 		page_tab[i] = (i * 0x1000) | flag;
-		AllocPhy(i);
+		Memory_AllocPhy(i);
 	}
 }
 
@@ -76,7 +84,7 @@ extern multiboot_t *glb_mboot_ptr;
 //---------------------------------------------------------------------------
 // ● 内存初始化
 //---------------------------------------------------------------------------
-Memory::Memory () {
+void Init_Memory () {
 
 	// 初始操作
 	upper_mem = glb_mboot_ptr->mem_upper;
@@ -115,7 +123,7 @@ Memory::Memory () {
 	}
 
 	// Put the Page Table in the Page Directory
-	map_pages_to_dir(0, (uint32_t*)kern_page_table, SL_RW_P);
+	Memory_map_pages_to_dir(0, (uint32_t*)kern_page_table, SL_RW_P);
 
 	// 启用
 	asm volatile ("movl %%eax, %%cr3" :: "a" (&page_directory)); // load PDPT into CR3
