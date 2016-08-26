@@ -29,7 +29,6 @@ extern void isr8(); 		// 8 #DF 双重故障(有错误代码)
 extern void isr9(); 		// 9 协处理器跨段操作
 extern void isr10(); 		// 10 #TS 无效TSS(有错误代码)
 extern void isr11(); 		// 11 #NP 段不存在(有错误代码)
-extern void isr12(); 		// 12 #SS 栈错误(有错误代码)
 extern void isr13(); 		// 13 #GP 常规保护(有错误代码)
 extern void isr15(); 		// 15 CPU 保留
 extern void isr17(); 		// 17 #AC 对齐检查
@@ -52,9 +51,8 @@ static void isr6_handler(pt_regs *regs) {
 	io_cpu_hlt();
 }
 
-// #PF 页故障(有错误代码)
-static void isr14_handler(pt_regs *regs) {
-	kputs("Page fault - #PF, ERR CODE: 0x");
+void common_handler_errcode_pos(pt_regs *regs) {
+	kputs(", ERR CODE: 0x");
 	char buf[9];
 	itoa(regs->err_code, buf, 16);
 	kputs(buf);
@@ -62,6 +60,24 @@ static void isr14_handler(pt_regs *regs) {
 	itoa(regs->eip, buf, 16);
 	kputs(buf);
 	kputs("\r\n");
+}
+
+// #SS 栈错误(有错误代码)
+static void isr12_handler(pt_regs *regs) {
+	kputs("Stack Error - #SS");
+	common_handler_errcode_pos(regs);
+}
+
+// #GP 常规保护(有错误代码)
+static void isr13_handler(pt_regs *regs) {
+	kputs("General Protection - #GP");
+	common_handler_errcode_pos(regs);
+}
+
+// #PF 页故障(有错误代码)
+static void isr14_handler(pt_regs *regs) {
+	kputs("Page fault - #PF");
+	common_handler_errcode_pos(regs);
 }
 
 // #MF 浮点处理单元错误
@@ -72,6 +88,8 @@ static void isr16_handler(pt_regs *regs) {
 void Init_Safe() {
 	idt_register_interrupt_handler(0, isr0_handler);
 	idt_register_interrupt_handler(6, isr6_handler);
+	idt_register_interrupt_handler(12, isr12_handler);
+	idt_register_interrupt_handler(13, isr13_handler);
 	idt_register_interrupt_handler(14, isr14_handler);
 	idt_register_interrupt_handler(16, isr16_handler);
 }

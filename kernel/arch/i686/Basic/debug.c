@@ -26,7 +26,7 @@ void kputc(char c) {
 }
 
 void kputs(char* st) {
-	char* s = st;
+	register char* s = st;
 	while (*s) kputc(*s++);
 }
 

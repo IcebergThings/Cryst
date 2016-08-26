@@ -43,7 +43,7 @@ typedef struct idt_ptr_t {
 //---------------------------------------------------------------------------
 // ● 寄存器类型
 //---------------------------------------------------------------------------
-typedef struct pt_regs_t {
+typedef volatile struct pt_regs_t {
 	uint32_t ds;		// 用于保存用户的数据段描述符
 	uint32_t edi; 		// 从 edi 到 eax 由 pusha 指令压入
 	uint32_t esi;

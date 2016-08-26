@@ -113,8 +113,6 @@ void Init_Memory () {
 
 	// holds the physical address where we want to start mapping these pages to.
 	// in this case, we want to map these pages to the very beginning of memory.
-	// we will fill 512 entries in the table, mapping 1.5 megabytes
-	// (lower memory 1M, kernel space and phy alloc space)
 	// 第一页不映射，这样能捕捉NULL指针
 	for(uint32_t i = 1; i < kernel_memory_end_page; i++) {
 		// As the address is page aligned, it will always leave 12 bits zeroed.
