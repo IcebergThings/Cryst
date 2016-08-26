@@ -166,7 +166,47 @@ irq_common_stub:
 	mov gs, bx
 	mov ss, bx
 
-	popa										; Pops edi,esi,ebp...
+	popad										; Pops edi,esi,ebp...
 	add esp, 8							; 清理压栈的 错误代码 和 ISR 编号
 	iret										; 出栈 CS, EIP, EFLAGS, SS, ESP
+.end:
+
+[GLOBAL switch_task_from_irq]
+switch_task_from_irq:
+	; 从时钟中断的结尾调用这个来切换
+	; C原型： void switch_task_from_irq(pt_regs* reg);
+	; 所以regs的指针应该在[esp + 4]里
+	mov eax, [esp + 4]			; pt_regs* reg
+	; 清除之前压入的一堆玩意
+	add esp, 4							; 调用这个函数传入的reg
+	add esp, 124						; irq_common_stub 和 timer_callback 用掉的124
+	add esp, 8							; irq的定义里传递的错误码和ISR号码
+
+	; 把处理器压入的值篡改以便iret
+	push dword	[eax + 60]	; ss
+	push dword	[eax + 56]	; useresp
+	push dword	[eax + 52]	; eflags
+	push dword	[eax + 48]	; cs
+	push dword	[eax + 44]	; eip
+	; 把popad的值放进去
+	push dword	[eax + 32]	; eax
+	push dword	[eax + 28]	; ecx
+	push dword	[eax + 24]	; edx
+	push dword	[eax + 20]	; ebx
+	push dword	[eax + 16]	; esp
+	push dword	[eax + 12]	; ebp
+	push dword	[eax + 8]		; esi
+	push dword	[eax + 4]		; edi
+
+	mov bx, [eax]						; ds = [eax + 0]
+	mov ds, bx							; 恢复到用户数据描述符
+	mov es, bx
+	mov fs, bx
+	mov gs, bx
+	mov ss, bx
+
+	; 刚刚推进去的伪造值都出来
+	; 然后就能“返回”到我们想去的地方
+	popad
+	iret
 .end:

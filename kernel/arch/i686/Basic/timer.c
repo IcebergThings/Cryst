@@ -25,16 +25,27 @@
 static uint64_t tick = 0;
 static uint64_t millis_from_boot = 0;
 uint32_t timer_frequency = 0;
+
+extern void switch_task_from_irq(pt_regs *regs);
+
+pt_regs kernel_regs;
+
 static void timer_callback(pt_regs *regs) {
 	tick++;
 	millis_from_boot += 1000 / timer_frequency;
+
+	memcpy(&kernel_regs, regs, sizeof(pt_regs));
+
 #ifdef DEBUG
-/*	kputs((char*) "[Tick : ");
+	kputs((char*) "[Tick : ");
 	char buf[32];
 	itoa(tick, buf, 10);
 	kputs(buf);
-	kputs("]\r\n");*/
+	kputs("]\r\n");
 #endif
+
+// let's test that
+	switch_task_from_irq(&kernel_regs);
 }
 
 void Timer_set_frequency(uint32_t frequency) {
