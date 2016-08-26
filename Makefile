@@ -37,9 +37,9 @@ ASM_FLAGS = -f elf32 -g -F stabs
 #----------------------------------------------------------------------------
 all: Cryst.bin
 run: all
-	qemu-system-i386 -kernel Cryst.bin
+	qemu-system-i386 --cpu coreduo -kernel Cryst.bin
 debug: all
-	qemu-system-i386 -kernel Cryst.bin -gdb tcp::1234 -S &
+	qemu-system-i386 --cpu coreduo -kernel Cryst.bin -gdb tcp::1234 -S &
 	sleep 1 # GDB要等QEMU就绪
 	cgdb -x scripts/gdbinit
 clean:
@@ -64,9 +64,9 @@ kernel/arch/${ARCH}/Basic/KFunc.o: kernel/arch/${ARCH}/Basic/KFunc.asm
 
 Cryst.bin: ${OBJECTS}
 	${CCLD} ${LD_FLAGS} -o Cryst.bin -O2 $^
-
 #----------------------------------------------------------------------------
 # ● 最终目标
 #----------------------------------------------------------------------------
 build: Cryst.bin
-	strip Cryst.bin
+	@echo Can not perform build now
+#	strip Cryst.bin
