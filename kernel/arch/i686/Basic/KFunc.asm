@@ -17,10 +17,10 @@
 ;   i686基础驱动：KFunc.asm。
 ;==============================================================================
 [GLOBAL idt_update]
-idt_update:				; void idtr(uint32_t ptr);
-	mov eax, [esp + 4]	; eax = ptr;
-	lidt [eax]			; lidt(*eax);
-	ret					; return;
+idt_update:										; void idtr(uint32_t ptr);
+	mov eax, [esp + 4]					; eax = ptr;
+	lidt [eax]									; lidt(*eax);
+	ret													; return;
 
 ; 定义两个构造中断处理函数的宏(有的中断有错误代码，有的没有)
 ; 用于没有错误代码的中断
@@ -143,12 +143,12 @@ IRQ  15,    47 	; IDE1 传输控制使用
 [GLOBAL irq_common_stub]
 [EXTERN irq_handler]
 irq_common_stub:
-	pusha                    ; pushes edi, esi, ebp, esp, ebx, edx, ecx, eax
+	pusha										; pushes edi, esi, ebp, esp, ebx, edx, ecx, eax
 
 	mov ax, ds
-	push eax                 ; 保存数据段描述符
+	push eax								; 保存数据段描述符
 
-	mov ax, 0x10  		 ; 加载内核数据段描述符
+	mov ax, 0x10						; 加载内核数据段描述符
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -159,14 +159,14 @@ irq_common_stub:
 	call irq_handler
 	add esp, 4
 
-	pop ebx                   ; 恢复原来的数据段描述符
+	pop ebx									; 恢复原来的数据段描述符
 	mov ds, bx
 	mov es, bx
 	mov fs, bx
 	mov gs, bx
 	mov ss, bx
 
-	popa                     ; Pops edi,esi,ebp...
-	add esp, 8     		 ; 清理压栈的 错误代码 和 ISR 编号
-	iret          		 ; 出栈 CS, EIP, EFLAGS, SS, ESP
+	popa										; Pops edi,esi,ebp...
+	add esp, 8							; 清理压栈的 错误代码 和 ISR 编号
+	iret										; 出栈 CS, EIP, EFLAGS, SS, ESP
 .end:

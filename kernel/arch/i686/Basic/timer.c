@@ -23,16 +23,13 @@
 // ● 时钟信号处理函数
 //---------------------------------------------------------------------------
 static uint64_t tick = 0;
-static double sec_from_boot = 0;
+static uint64_t millis_from_boot = 0;
 uint32_t timer_frequency = 0;
 static void timer_callback(pt_regs *regs) {
 	tick++;
-	//sec_from_boot += 1.0 / (double)timer_frequency;
-	//if(sec_from_boot > 5.0) {
-	//	Timer_set_frequency(10);
-	//}
+	millis_from_boot += 1000 / timer_frequency;
 #ifdef DEBUG
-	/*kputs((char*) "[Tick : ");
+/*	kputs((char*) "[Tick : ");
 	char buf[32];
 	itoa(tick, buf, 10);
 	kputs(buf);
