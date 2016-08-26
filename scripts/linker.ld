@@ -15,11 +15,6 @@ SECTIONS
 		*(.rodata)
 		. = ALIGN(4096);
 	}
-	.bss :
-	{
-		*(.bss)
-		. = ALIGN(4096);
-	}
 	.stab :
 	{
 		*(.stab)
@@ -30,8 +25,14 @@ SECTIONS
 		*(.stabstr)
 		. = ALIGN(4096);
 	}
+	.bss :
+	{
+		*(.bss)
+		. = ALIGN(4096);
+	}
 
-	. = ALIGN(4096);
+	STACK_TOP = .;
+	. = ALIGN(32768);
 	KERNEL_CODE_END = .;
 
 	/DISCARD/ : { *(.comment) *(.eh_frame) }
