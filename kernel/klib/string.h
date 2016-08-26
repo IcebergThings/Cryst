@@ -17,6 +17,14 @@
 //   内核字符串库
 //=============================================================================
 
+#ifndef INCLUDE_STRING_H_
+#define INCLUDE_STRING_H_
+
+#include "Basic/types.h"
 #include "config.h"
 
 char* itoa(int value, char* result, int base);
+
+//volatile void memcpy(void *dest, void *src, size_t n);
+
+#endif
