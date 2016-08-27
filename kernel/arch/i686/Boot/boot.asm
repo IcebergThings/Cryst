@@ -51,33 +51,33 @@ section .multiboot
 
 ; 在代码段的起始位置设置符合 Multiboot 规范的标记
 
-dd MBOOT_HEADER_MAGIC 	; GRUB 会通过这个魔数判断该映像是否支持
-dd MBOOT_HEADER_FLAGS   ; GRUB 的一些加载时选项，其详细注释在定义处
-dd MBOOT_CHECKSUM       ; 检测数值，其含义在定义处
+dd MBOOT_HEADER_MAGIC 			; GRUB 会通过这个魔数判断该映像是否支持
+dd MBOOT_HEADER_FLAGS				; GRUB 的一些加载时选项，其详细注释在定义处
+dd MBOOT_CHECKSUM						; 检测数值，其含义在定义处
 
-[GLOBAL _start] 		; 内核代码入口，此处提供该声明给 ld 链接器
-[GLOBAL glb_mboot_ptr] 	; 全局的 struct multiboot * 变量
-[EXTERN kernel_main] 	; 声明内核 C 代码的入口函数
-[EXTERN STACK_TOP]		; 声明内核栈顶 (从linker.ld获取以节省体积)
+[GLOBAL _start]							; 内核代码入口，此处提供该声明给 ld 链接器
+[GLOBAL glb_mboot_ptr]			; 全局的 struct multiboot * 变量
+[EXTERN kernel_main]				; 声明内核 C 代码的入口函数
+[EXTERN STACK_TOP]					; 声明内核栈顶 (从linker.ld获取以节省体积)
 
-section .text 			; 代码段从这里开始
+section .text 							; 代码段从这里开始
 
 _start:
-	cli  			 	; 此时还没有设置好保护模式的中断处理，要关闭中断
-				 		; 所以必须关闭中断
-	mov esp, STACK_TOP  ; 设置内核栈地址
-	mov ebp, 0 		 	; 帧指针修改为 0
-	and esp, 0FFFFFFF0H	 		; 栈地址按照16字节对齐
+	cli												; 此时还没有设置好保护模式的中断处理，要关闭中断
+														; 所以必须关闭中断
+	mov esp, STACK_TOP				; 设置内核栈地址
+	mov ebp, 0								; 帧指针修改为 0
+	and esp, 0xFFFFFF					; 栈地址按照16字节对齐
 	mov [glb_mboot_ptr], ebx 	; 将 ebx 中存储的指针存入全局变量
 
 .fpu_probe:
-	mov edx, cr0                            ; Start probe, get CR0
-	and edx, (-1) - (CR0_TS + CR0_EM)       ; clear TS and EM to force fpu access
-	mov cr0, edx                            ; store control word
-	fninit                                  ; load defaults to FPU
-	fnstsw [.testword]                      ; store status word
-	cmp word [.testword], 0                 ; compare the written status with the expected FPU state
-	jne .nofpu                              ; jump if the FPU hasn't written anything (i.e. it's not there)
+	mov edx, cr0							; Start probe, get CR0
+	and edx, FPU_T						; clear TS and EM to force fpu access
+	mov cr0, edx							; store control word
+	fninit										; load defaults to FPU
+	fnstsw [.testword]				; store status word
+	cmp word [.testword], 0		; compare the written status with the expected FPU state
+	jne .nofpu								; jump if the FPU hasn't written anything (i.e. it's not there)
 	jmp .hasfpu
 .nofpu:
 	hlt
@@ -85,18 +85,21 @@ _start:
 
 CR0_TS	equ	001000b
 CR0_EM	equ	000100b
-.testword: DW 0x55AA                    ; store garbage to be able to detect a change
+FPU_T		equ (-1) - (CR0_TS + CR0_EM)
+
+.testword: DW 0x55AA				; store garbage to be able to detect a change
 .hasfpu:
 ;	mov edx, cr0
-;	xor edx, (CR0_EM | CR0_TS)						; clear TS and EM to force fpu access
+;	xor edx, (CR0_EM | CR0_TS); clear TS and EM to force fpu access
 ;	mov cr0, edx
 
-	jmp kernel_main		 		; 调用内核入口函数
+	jmp kernel_main						; 调用内核入口函数
+.end:
 
 ;-----------------------------------------------------------------------------
 
-section .bss			; 未初始化的数据段从这里开始
-glb_mboot_ptr:		; 全局的 multiboot 结构体指针
+section .bss								; 未初始化的数据段从这里开始
+glb_mboot_ptr:							; 全局的 multiboot 结构体指针
 	resb 4
 
 ;-----------------------------------------------------------------------------
