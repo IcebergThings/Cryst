@@ -15,6 +15,11 @@ SECTIONS
 		*(.rodata)
 		. = ALIGN(4096);
 	}
+	.bss :
+	{
+		*(.bss)
+		. = ALIGN(4096);
+	}
 	.stab :
 	{
 		*(.stab)
@@ -23,11 +28,6 @@ SECTIONS
 	.stabstr :
 	{
 		*(.stabstr)
-		. = ALIGN(4096);
-	}
-	.bss :
-	{
-		*(.bss)
 		. = ALIGN(4096);
 	}
 
