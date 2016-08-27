@@ -37,12 +37,12 @@ extern void isr19(); 		// 19 #XM SIMD(单指令多数据)浮点异常*/
 
 // #DE 除 0 异常
 static void isr0_handler(pt_regs *regs) {
-	kputs("Divisible by 0 - #DE\r\n");
+	kputs("Divide by 0 - #DE\r\n");
 }
 
 // #UD 无效或未定义的操作码
 static void isr6_handler(pt_regs *regs) {
-	kputs("Undefined code - UD# at position 0x");
+	kputs("Undefined opcode - UD# at position 0x");
 	char buf[9];
 	itoa(regs->eip, buf, 16);
 	kputs(buf);
@@ -82,7 +82,7 @@ static void isr14_handler(pt_regs *regs) {
 
 // #MF 浮点处理单元错误
 static void isr16_handler(pt_regs *regs) {
-	kputs("Float ERROR - #MF\r\n");
+	kputs("Float Fault - #MF\r\n");
 }
 
 void Init_Safe() {
