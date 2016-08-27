@@ -192,10 +192,18 @@ timer_callback_shell:
 
 	push esp								; 本质来说我们的pt_regs就在栈里
 	call timer_callback
+	add esp, 4							; 记得之前推进来的那个pt_regs吗，现在我们把它清理掉
+
 	; 调用完之后新的pt_regs就在eax里了
-	mov byte [esp], 0x00		; 记得之前推进来的那个pt_regs吗，现在我们把它清理掉
-	add esp, 4							; 防止用户进程捡到内核数据我就把那个值直接清零
-	mov esp, eax						; 这一步骨骼清奇，任务转换都靠它
+	push eax
+	jmp lc_switch_to
+.end:
+
+[GLOBAL switch_to]
+switch_to:								; void switch_to(pt_regs* regs);
+	add esp, 4
+lc_switch_to:							; lc_switch_to只能JMP用
+	pop esp									; 这一步骨骼清奇，任务转换都靠它
 
 	pop ecx									; 然后把段寄存器还给它
 	mov ds, cx
