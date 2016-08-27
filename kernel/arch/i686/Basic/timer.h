@@ -33,6 +33,7 @@
 extern uint32_t timer_frequency;
 
 void Timer_set_frequency(uint32_t frequency);
+extern volatile pt_regs* timer_callback(pt_regs *regs);
 
 //---------------------------------------------------------------------------
 // ● 时钟初始化

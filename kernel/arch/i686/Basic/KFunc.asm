@@ -123,7 +123,7 @@ irq%1:
 	jmp irq_common_stub
 %endmacro
 
-IRQ   0,    32 	; 电脑系统计时器
+;IRQ   0,    32 	; 电脑系统计时器
 IRQ   1,    33 	; 键盘
 IRQ   2,    34 	; 与 IRQ9 相接，MPU-401 MD 使用
 IRQ   3,    35 	; 串口设备
@@ -143,6 +143,7 @@ IRQ  15,    47 	; IDE1 传输控制使用
 [GLOBAL irq_common_stub]
 [EXTERN irq_handler]
 irq_common_stub:
+;	mov [ESP_TEMP_PTR + 4], esp
 	pusha										; pushes edi, esi, ebp, esp, ebx, edx, ecx, eax
 
 	mov ax, ds
@@ -171,42 +172,39 @@ irq_common_stub:
 	iret										; 出栈 CS, EIP, EFLAGS, SS, ESP
 .end:
 
-[GLOBAL switch_task_from_irq]
-switch_task_from_irq:
-	; 从时钟中断的结尾调用这个来切换
-	; C原型： void switch_task_from_irq(pt_regs* reg);
-	; 所以regs的指针应该在[esp + 4]里
-	mov eax, [esp + 4]			; pt_regs* reg
-	; 清除之前压入的一堆玩意
-	add esp, 4							; 调用这个函数传入的reg
-	add esp, 124						; irq_common_stub 和 timer_callback 用掉的124
-	add esp, 8							; irq的定义里传递的错误码和ISR号码
+;[GLOBAL switch_task_from_irq]
+[EXTERN timer_callback]
+[GLOBAL irq0]
+irq0:
+	cli
+timer_callback_shell:
+	pushad									; 搞什么专门空间来存寄存器（
+													; 直接推进这个进程的栈里
+	mov ax, ds
+	push eax								; 保存数据段描述符
 
-	; 把处理器压入的值篡改以便iret
-	push dword	[eax + 60]	; ss
-	push dword	[eax + 56]	; useresp
-	push dword	[eax + 52]	; eflags
-	push dword	[eax + 48]	; cs
-	push dword	[eax + 44]	; eip
-	; 把popad的值放进去
-	push dword	[eax + 32]	; eax
-	push dword	[eax + 28]	; ecx
-	push dword	[eax + 24]	; edx
-	push dword	[eax + 20]	; ebx
-	push dword	[eax + 16]	; esp
-	push dword	[eax + 12]	; ebp
-	push dword	[eax + 8]		; esi
-	push dword	[eax + 4]		; edi
+	mov ax, 0x10            ; 加载内核数据段描述符表
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
 
-	mov bx, [eax]						; ds = [eax + 0]
-	mov ds, bx							; 恢复到用户数据描述符
-	mov es, bx
-	mov fs, bx
-	mov gs, bx
-	mov ss, bx
+	push esp								; 本质来说我们的pt_regs就在栈里
+	call timer_callback
+	; 调用完之后新的pt_regs就在eax里了
+	mov byte [esp], 0x00		; 记得之前推进来的那个pt_regs吗，现在我们把它清理掉
+	add esp, 4							; 防止用户进程捡到内核数据我就把那个值直接清零
+	mov esp, eax						; 这一步骨骼清奇，任务转换都靠它
 
-	; 刚刚推进去的伪造值都出来
-	; 然后就能“返回”到我们想去的地方
-	popad
-	iret
+	pop ecx									; 然后把段寄存器还给它
+	mov ds, cx
+	mov es, cx
+	mov fs, cx
+	mov gs, cx
+	mov ss, cx
+
+	popad										; 归还寄存器
+	sti
+	iret										; 霸占完别人的栈，然后清理清理偷偷溜走233
 .end:

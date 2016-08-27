@@ -59,7 +59,7 @@ void arch_init () {
 	#ifdef DEBUG
 		kputs("Timer Initialized\r\n");
 	#endif
-	return;
+//	return;
 }
 
 //---------------------------------------------------------------------------

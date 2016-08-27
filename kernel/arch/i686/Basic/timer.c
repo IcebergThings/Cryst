@@ -28,24 +28,27 @@ uint32_t timer_frequency = 0;
 
 extern void switch_task_from_irq(pt_regs *regs);
 
-pt_regs kernel_regs;
+static pt_regs kernel_regs;
 
-static void timer_callback(pt_regs *regs) {
+volatile pt_regs* timer_callback(pt_regs *regs) {
 	tick++;
 	millis_from_boot += 1000 / timer_frequency;
 
-	memcpy(&kernel_regs, regs, sizeof(pt_regs));
+	//memcpy(&kernel_regs, regs, sizeof(pt_regs));
 
 #ifdef DEBUG
+//#ifdef TIMER_VERBOSE_TICKS
 	kputs((char*) "[Tick : ");
 	char buf[32];
 	itoa(tick, buf, 10);
 	kputs(buf);
 	kputs("]\r\n");
+//#endif
 #endif
 
-// let's test that
-	switch_task_from_irq(&kernel_regs);
+	io_out8(0x20, 0x20); //重设时钟中断
+
+	return regs;
 }
 
 void Timer_set_frequency(uint32_t frequency) {
@@ -72,7 +75,8 @@ void Timer_set_frequency(uint32_t frequency) {
 //---------------------------------------------------------------------------
 void Init_Timer(uint32_t frequency) {
 	// 注册时间相关的处理函数
-	idt_register_interrupt_handler(IRQ0, timer_callback);
+	//idt_register_interrupt_handler(IRQ0, timer_callback); // Deprecated
+	// Now timer has dedicated function implementation
 
 	// D7 D6 D5 D4 D3 D2 D1 D0
 	// 0  0  1  1  0  1  1  0
