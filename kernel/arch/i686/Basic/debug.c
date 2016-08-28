@@ -59,5 +59,5 @@ void kprintln(char* format, ...) {
 // ● X86 debug初始化
 //---------------------------------------------------------------------------
 void Init_Debug() {
-	Init_RS232(&serial_debug, COM1);
+	Init_RS232(&serial_debug, COM1, 115200);
 }

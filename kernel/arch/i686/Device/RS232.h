@@ -29,6 +29,9 @@
 #define COM1 0x3f8
 
 typedef struct _RS232_t {
+	uint16_t rate;
+	uint16_t rate_divisor;
+
 	uint16_t port;
 } RS232_t;
 
@@ -37,6 +40,6 @@ void RS232_write_serial(RS232_t* device, char a);
 //---------------------------------------------------------------------------
 // ● 初始化
 //---------------------------------------------------------------------------
-void Init_RS232(RS232_t* device, uint16_t);
+void Init_RS232(RS232_t* device, uint16_t port, uint16_t rate);
 
 #endif
