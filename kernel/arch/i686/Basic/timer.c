@@ -55,13 +55,9 @@ void Timer_set_frequency(uint32_t frequency) {
 	uint32_t divisor = 1193180 / frequency;
 	timer_frequency = frequency;
 
-	// 拆分低字节和高字节
-	uint8_t low = (uint8_t)(divisor & 0xFF);
-	uint8_t hign = (uint8_t)((divisor >> 8) & 0xFF);
-
 	// 分别写入低字节和高字节
-	io_out8(0x40, low);
-	io_out8(0x40, hign);
+	io_out8(0x40, (uint8_t)(divisor & 0xFF));
+	io_out8(0x40, (uint8_t)((divisor >> 8) & 0xFF));
 
 	io_sti();
 }

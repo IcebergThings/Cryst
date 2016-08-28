@@ -28,8 +28,8 @@ void Init_RS232(RS232_t* device, uint16_t port, int rate) {
 	io_out8(port + 3, 0x80);    // Enable DLAB (set baud rate divisor)
 
 	// Set divisor
-	io_out8(port + 0, (uint8_t) device->rate_divisor);
-	io_out8(port + 1, (uint8_t) device->rate_divisor >> 8);
+	io_out8(port + 0, (uint8_t) ((device->rate_divisor) & 0xFF));
+	io_out8(port + 1, (uint8_t) ((device->rate_divisor >> 8) & 0xFF));
 
 	io_out8(port + 3, 0x03);    // 8 bits, no parity, one stop bit
 	io_out8(port + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
