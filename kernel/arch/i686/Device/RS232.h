@@ -40,6 +40,6 @@ void RS232_write_serial(RS232_t* device, char a);
 //---------------------------------------------------------------------------
 // ● 初始化
 //---------------------------------------------------------------------------
-void Init_RS232(RS232_t* device, uint16_t port, uint16_t rate);
+void Init_RS232(RS232_t* device, uint16_t port, int rate);
 
 #endif

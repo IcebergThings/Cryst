@@ -38,11 +38,7 @@ volatile pt_regs* timer_callback(pt_regs *regs) {
 
 #ifdef DEBUG
 //#ifdef TIMER_VERBOSE_TICKS
-	kputs((char*) "[Tick : ");
-	char buf[32];
-	itoa(tick, buf, 10);
-	kputs(buf);
-	kputs("]\r\n");
+	kprintln("[%s : %d]", "Tick", tick);
 //#endif
 #endif
 

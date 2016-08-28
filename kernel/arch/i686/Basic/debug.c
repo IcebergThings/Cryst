@@ -31,26 +31,29 @@ void kputs(char* st) {
 }
 
 void kprintln(char* format, ...) {
-	#warning KPRINTLN BROKEN
-	uint8_t *varg = (uint8_t*)(&format);
-	//varg += 2;
-	while (*format) {
-		if (*format == '%') {
-			format++;
-			if (*format == 's') {
-				kputs(*((char**)varg));
-				varg += sizeof(char);
-			} else if (*format == 'd') {
-				char buf[64];
-				itoa((uint32_t) *((uint32_t*)varg), buf, 10);
+	register char* f = format;
+	register char** varg = (&format) + 7; // Why is 7? I don't know, it just works
+	while (*f) {
+		if (*f == '%') {
+			char buf[64];
+			f++;
+			if (*f == 's') {
+				kputs(*(varg));
+				varg += 1;
+			} else if (*f == 'd') {
+				itoa(*((int*)varg), buf, 10);
+				kputs(buf);
+				varg += sizeof(int);
+			} else if (*f == 'x') {
+				itoa(*((int*)varg), buf, 16);
 				kputs(buf);
 				varg += sizeof(int);
 			}
 
 		} else {
-			kputc(*format);
+			kputc(*f);
 		}
-		format++;
+		f++;
 	}
 	kputs("\r\n");
 }

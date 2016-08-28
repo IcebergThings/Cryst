@@ -19,7 +19,7 @@
 
 #include "RS232.h"
 
-void Init_RS232(RS232_t* device, uint16_t port, uint16_t rate) {
+void Init_RS232(RS232_t* device, uint16_t port, int rate) {
 	device->port = port;
 	device->rate = rate;
 	device->rate_divisor = 115200 / rate;
