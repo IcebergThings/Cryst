@@ -21,26 +21,27 @@
 #define INCLUDE_TYPES_H_
 
 #ifndef NULL
-	#define NULL 0
+	#define NULL ((void*) 0)
 #endif
 
-#ifndef true
-	#define true  1
-	#define false 0
-#endif
-
-#ifndef bool
-	#define bool int8_t
+typedef int8_t bool;
+#if !(defined(true) && defined(false))
+	#define true ((bool) 1)
+	#define false ((bool) 0)
 #endif
 
 typedef unsigned long  uint64_t;
-typedef          long  int64_t;
+typedef   signed long  int64_t;
 typedef unsigned int   uint32_t;
-typedef          int   int32_t;
+typedef   signed int   int32_t;
 typedef unsigned short uint16_t;
-typedef          short int16_t;
+typedef   signed short int16_t;
 typedef unsigned char  uint8_t;
-typedef          char  int8_t;
-typedef unsigned int size_t;
+typedef   signed char  int8_t;
+typedef unsigned int   size_t;
+typedef   signed int   intptr_t;
+typedef unsigned int   intptr_t;
+// 我们的征途是……
+// http://en.cppreference.com/w/c/types/integer
 
 #endif 	// INCLUDE_TYPES_H_

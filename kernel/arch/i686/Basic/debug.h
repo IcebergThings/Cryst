@@ -30,8 +30,9 @@
 extern RS232_t debug_serial;
 
 void kputc(char c);
-void kputs(char* st);
-void kprintln(char* format, ...);
+void kprint(char* s);
+void kputs(char* s);
+void kprintf(char* format, ...);
 //---------------------------------------------------------------------------
 // ● X86 debug初始化
 //---------------------------------------------------------------------------

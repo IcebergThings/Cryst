@@ -60,11 +60,11 @@ void isr_handler(pt_regs *regs)
 		interrupt_handlers[regs->int_no] (regs);
 	} else {
 #ifdef DEBUG
-		kputs("Unhandled interrupt! ID: ");
+		kprint("Unhandled interrupt! ID: ");
 		char buf[4];
 		itoa(regs->int_no, buf, 10);
-		kputs(buf);
-		kputs("\r\n");
+		kprint(buf);
+		kprint("\r\n");
 #endif
 	}
 }

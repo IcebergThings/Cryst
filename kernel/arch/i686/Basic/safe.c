@@ -37,34 +37,34 @@ extern void isr19(); 		// 19 #XM SIMD(单指令多数据)浮点异常*/
 
 // #DE 除 0 异常
 static void isr0_handler(pt_regs *regs) {
-	kprintln("Divide by 0 - #DE, at EIP=0x%x", regs->eip);
+	kprintf("Divide by 0 - #DE, at EIP=0x%x\r\n", regs->eip);
 }
 
 // #UD 无效或未定义的操作码
 static void isr6_handler(pt_regs *regs) {
-	kprintln("Undefined - #UD, at EIP=0x%x", regs->eip);
+	kprintf("Undefined - #UD, at EIP=0x%x\r\n", regs->eip);
 
 	io_cpu_hlt();
 }
 
 // #SS 栈错误(有错误代码)
 static void isr12_handler(pt_regs *regs) {
-	kprintln("Stack Error - #SS, ERR CODE=0x%x, at EIP=0x%x", regs->err_code, regs->eip);
+	kprintf("Stack Error - #SS, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
 }
 
 // #GP 常规保护(有错误代码)
 static void isr13_handler(pt_regs *regs) {
-	kprintln("General Protection - #GP, ERR CODE=0x%x, at EIP=0x%x", regs->err_code, regs->eip);
+	kprintf("General Protection - #GP, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
 }
 
 // #PF 页故障(有错误代码)
 static void isr14_handler(pt_regs *regs) {
-	kprintln("Page fault - #PF, ERR CODE=0x%x, at EIP=0x%x", regs->err_code, regs->eip);
+	kprintf("Page fault - #PF, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
 }
 
 // #MF 浮点处理单元错误
 static void isr16_handler(pt_regs *regs) {
-	kprintln("Float Fault - #MF, at EIP=0x%x", regs->eip);
+	kprintf("Float Fault - #MF, at EIP=0x%x\r\n", regs->eip);
 }
 
 void Init_Safe() {

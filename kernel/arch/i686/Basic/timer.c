@@ -35,7 +35,7 @@ volatile task_t* timer_callback(task_t *regs) {
 
 	#ifdef DEBUG
 		#ifdef TIMER_VERBOSE_TICKS
-			kprintln("[%s : %d]", "Tick", tick);
+			kprintf("[%s : %d]\r\n", "Tick", tick);
 		#endif
 	#endif
 
