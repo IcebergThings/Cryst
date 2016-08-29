@@ -37,7 +37,7 @@
 typedef
 struct multiboot_t {
 	uint32_t flags;			// Multiboot 的版本信息
-	/** 
+	/**
 	 * 从 BIOS 获知的可用内存
 	 *
 	 * mem_lower和mem_upper分别指出了低端和高端内存的大小，单位是K。
@@ -52,7 +52,7 @@ struct multiboot_t {
 	uint32_t cmdline;		// 内核命令行
 	uint32_t mods_count;		// boot 模块列表
 	uint32_t mods_addr;
-	
+
 	/**
 	 * ELF 格式内核映像的section头表。
 	 * 包括每项的大小、一共有几项以及作为名字索引的字符串表。
@@ -67,10 +67,10 @@ struct multiboot_t {
 	 * mmap_addr是缓冲区的地址，mmap_length是缓冲区的总大小
 	 * 缓冲区由一个或者多个下面的大小/结构对 mmap_entry_t 组成
 	 */
-	uint32_t mmap_length;		
+	uint32_t mmap_length;
 	uint32_t mmap_addr;
-	
-	uint32_t drives_length; 	// 指出第一个驱动器结构的物理地址	
+
+	uint32_t drives_length; 	// 指出第一个驱动器结构的物理地址
 	uint32_t drives_addr; 		// 指出第一个驱动器这个结构的大小
 	uint32_t config_table; 		// ROM 配置表
 	uint32_t boot_loader_name; 	// boot loader 的名字
