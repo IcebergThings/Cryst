@@ -12,33 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //=============================================================================
-// ■ Timer.h
+// ■ Task.h
 //-----------------------------------------------------------------------------
-//   i686基础驱动：Timer。
+//   i686任务
 //=============================================================================
 
-#ifndef INCLUDE_TIMER_H
-#define INCLUDE_TIMER_H
+#ifndef INCLUDE_TASK_H
+#define INCLUDE_TASK_H
 
-#include "Basic/idt.h"
-#include "Basic/io.h"
-#include "Basic/task.h"
-#include "kernel_interface.h"
 #include "config.h"
+#include "Basic/types.h"
 
-#ifdef DEBUG
-#include "Basic/debug.h"
-#include "Device/RS232.h"
-#endif
+typedef volatile struct _task_t {
+	uint32_t ds;		// 用于保存用户的数据段描述符
+	uint32_t edi; 	// 从 edi 到 eax 由 pusha 指令压入
+	uint32_t esi;
+	uint32_t ebp;
+	uint32_t esp;
+	uint32_t ebx;
+	uint32_t edx;
+	uint32_t ecx;
+	uint32_t eax;
+	uint32_t eip;		// 以下由处理器自动压入
+	uint32_t cs;
+	uint32_t eflags;
+	uint32_t useresp;
+	uint32_t ss;
+} task_t;
 
-extern uint32_t timer_frequency;
+extern volatile void taskb();
+extern volatile char stb[4096];
 
-void Timer_set_frequency(uint32_t frequency);
-extern volatile task_t* timer_callback(task_t *regs);
+void create_task(task_t* model, void* stack, void* eip);
 
-//---------------------------------------------------------------------------
-// ● 时钟初始化
-//---------------------------------------------------------------------------
-void Init_Timer(uint32_t frequency);
+void dump_task(task_t* regs);
 
 #endif

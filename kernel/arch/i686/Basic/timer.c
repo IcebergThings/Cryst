@@ -19,30 +19,29 @@
 
 #include "Basic/timer.h"
 
-//---------------------------------------------------------------------------
-// ● 时钟信号处理函数
-//---------------------------------------------------------------------------
 static uint64_t tick = 0;
 static uint64_t millis_from_boot = 0;
 uint32_t timer_frequency = 0;
 
-extern void switch_task_from_irq(pt_regs *regs);
+static task_t* kernel_regs;
 
-static pt_regs kernel_regs;
-
-volatile pt_regs* timer_callback(pt_regs *regs) {
+//---------------------------------------------------------------------------
+// ● 时钟信号处理函数
+//---------------------------------------------------------------------------
+//#define TIMER_VERBOSE_TICKS
+volatile task_t* timer_callback(task_t *regs) {
 	tick++;
 	millis_from_boot += 1000 / timer_frequency;
 
-	//memcpy(&kernel_regs, regs, sizeof(pt_regs));
-
-#ifdef DEBUG
-//#ifdef TIMER_VERBOSE_TICKS
-	kprintln("[%s : %d]", "Tick", tick);
-//#endif
-#endif
+	#ifdef DEBUG
+		#ifdef TIMER_VERBOSE_TICKS
+			kprintln("[%s : %d]", "Tick", tick);
+		#endif
+	#endif
 
 	io_out8(0x20, 0x20); //重设时钟中断
+
+	if (regs->ds == 0x10) kernel_regs = regs; //更新内核regs
 
 	return regs;
 }

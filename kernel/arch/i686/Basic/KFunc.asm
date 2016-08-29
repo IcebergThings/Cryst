@@ -216,3 +216,9 @@ lc_switch_to:							; lc_switch_to只能JMP用
 	sti
 	iret										; 霸占完别人的栈，然后清理清理偷偷溜走233
 .end:
+
+[GLOBAL sttaskb]
+section .bss
+sttaskb:
+RESB 32768
+.end:
