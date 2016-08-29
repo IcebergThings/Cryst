@@ -28,9 +28,12 @@ SECTIONS
 	.stabstr :
 	{
 		*(.stabstr)
-	 	. = ALIGN(4096);
+		. = ALIGN(4096);
 	}
-	
+
+	STACK_TOP = .;
+	. = ALIGN(32768);
+	KERNEL_CODE_END = .;
+
 	/DISCARD/ : { *(.comment) *(.eh_frame) }
 }
-

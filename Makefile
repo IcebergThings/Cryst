@@ -18,49 +18,55 @@
 #----------------------------------------------------------------------------
 # ● 定义变量
 #----------------------------------------------------------------------------
-CC=clang++ -m32
+CC=clang -m32
 CCLD=ld -melf_i386
 ARCH=i686
 
-C_SOURCES = $(shell find . -name "*.cpp")
-C_OBJECTS = $(patsubst %.cpp, %.o, $(C_SOURCES))
+C_SOURCES = $(shell find . -name "*.c")
+C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
 S_SOURCES = $(shell find . -name "*.asm")
 S_OBJECTS = $(patsubst %.asm, %.o, $(S_SOURCES))
 OBJECTS = $(C_OBJECTS) $(S_OBJECTS)
 
-C_FLAGS = -c -Wall -m32 -ggdb -nostdinc -fno-builtin -fno-stack-protector -IDrivers/${ARCH} -I./ -O2
-LD_FLAGS = -T scripts/linker.ld -m elf_i386 -no-builtin -nostdlib -O2
+C_FLAGS = -c -Wall -m32 -ggdb -nostdinc -fno-builtin -fno-stack-protector -Ikernel/arch/${ARCH} -I./kernel/ -O4
+LD_FLAGS = -T scripts/linker.ld -m elf_i386 -no-builtin -nostdlib -O4
 ASM_FLAGS = -f elf32 -g -F stabs
 
 #----------------------------------------------------------------------------
 # ● 一般目标
 #----------------------------------------------------------------------------
-all: mine.bin
+all: Cryst.bin
 run: all
-	qemu-system-i386 -kernel mine.bin
+	qemu-system-i386 --cpu coreduo -kernel Cryst.bin
 debug: all
-	qemu-system-i386 -kernel mine.bin -gdb tcp::1234 -S &
-	sleep 1 # gdb要等qemu就绪
-	cgdb -x gdbinit
+	qemu-system-i386 --cpu coreduo -kernel Cryst.bin -gdb tcp::1234 -S &
+	sleep 1 # GDB要等QEMU就绪
+	cgdb -x scripts/gdbinit
 clean:
-	rm -f ${C_OBJECTS} ${S_OBJECTS} mine.bin
+	rm -f ${C_OBJECTS} ${S_OBJECTS} Cryst.bin
 .PHONY: all run clean
 
 #----------------------------------------------------------------------------
 # ● 通用目标
 #----------------------------------------------------------------------------
-.cpp.o: .c
+.c.o: .c
 	@echo 编译C++代码文件$<……
 	$(CC) $(C_FLAGS) $< -o $@
 
 #----------------------------------------------------------------------------
 # ● 特定目标
 #----------------------------------------------------------------------------
-Drivers/${ARCH}/Boot/boot.o: Drivers/${ARCH}/Boot/boot.asm
+kernel/arch/${ARCH}/Boot/boot.o: kernel/arch/${ARCH}/Boot/boot.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-Drivers/${ARCH}/Basic/KFunc.o: Drivers/${ARCH}/Basic/KFunc.asm
+kernel/arch/${ARCH}/Basic/KFunc.o: kernel/arch/${ARCH}/Basic/KFunc.asm
 	nasm ${ASM_FLAGS} $^ -o $@
 
-mine.bin: ${OBJECTS}
-	${CCLD} ${LD_FLAGS} -o mine.bin -O2 $^
+Cryst.bin: ${OBJECTS}
+	${CCLD} ${LD_FLAGS} -o Cryst.bin -O2 $^
+#----------------------------------------------------------------------------
+# ● 最终目标
+#----------------------------------------------------------------------------
+build: Cryst.bin
+	@echo Can not perform build now
+#	strip Cryst.bin
