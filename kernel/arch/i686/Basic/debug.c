@@ -25,37 +25,40 @@ void kputc(char c) {
 	RS232_write_serial(&serial_debug, c);
 }
 
-void kputs(char* st) {
-	register char* s = st;
+void kprint(char* s) {
 	while (*s) kputc(*s++);
 }
 
-void kprintln(char* format, ...) {
+void kputs(char* s) {
+	kprint(s);
+	kputc('\r');
+	kputc('\n');
+}
+
+void kprintf(char* format, ...) {
 	register char* f = format;
-	register char** varg = (&format) + 7; // Why is 7? I don't know, it just works
+	register char** varg = (&format) + 7; // Why 7? I don't know, it just works
 	while (*f) {
 		if (*f == '%') {
 			char buf[64];
 			f++;
 			if (*f == 's') {
-				kputs(*(varg));
+				kprint(*varg);
 				varg += 1;
 			} else if (*f == 'd') {
-				itoa(*((int*)varg), buf, 10);
-				kputs(buf);
+				itoa(*((int*) varg), buf, 10);
+				kprint(buf);
 				varg += sizeof(int);
 			} else if (*f == 'x') {
-				itoa(*((int*)varg), buf, 16);
-				kputs(buf);
+				itoa(*((int*) varg), buf, 16);
+				kprint(buf);
 				varg += sizeof(int);
 			}
-
 		} else {
 			kputc(*f);
 		}
 		f++;
 	}
-	kputs("\r\n");
 }
 
 //---------------------------------------------------------------------------

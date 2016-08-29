@@ -40,24 +40,24 @@
 void arch_init () {
 	#ifdef DEBUG
 		Init_Debug();
-		kputs("In Kernel\r\n");
+		kprint("In Kernel\r\n");
 	#endif
 
 	Init_Memory();
 	#ifdef DEBUG
-		kputs("Memory Initialized\r\n");
+		kprint("Memory Initialized\r\n");
 	#endif
 	Init_IDT();
 	#ifdef DEBUG
-		kputs("IDT Initialized\r\n");
+		kprint("IDT Initialized\r\n");
 	#endif
 	Init_Safe();
 	#ifdef DEBUG
-		kputs("Safe Module Initialized\r\n");
+		kprint("Safe Module Initialized\r\n");
 	#endif
 	Init_Timer(200);
 	#ifdef DEBUG
-		kputs("Timer Initialized\r\n");
+		kprint("Timer Initialized\r\n");
 	#endif
 //	return;
 }

@@ -30,41 +30,41 @@ volatile void taskb() {
 volatile char stb[4096];
 
 void create_task(task_t* model, void* stack, void* eip) {
-	kprintln("New task, esp=0x%x", stack);
+	kprintf("New task, esp=0x%x\r\n", stack);
 	task_t* t = (task_t*)(stack);
 	t->ds = 0x10;
 	t->edi = 0x0; 	// 从 edi 到 eax 由 pusha 指令压入
 	t->esi = 0x0;
 	t->ebp = 0x0;
 	t->esp = (uint32_t) t + 24;
-	kprintln("task->esp=%x", t->esp);
+	kprintf("task->esp=%x\r\n", t->esp);
 	t->ebx = 0x0;
 	t->edx = 0x0;
 	t->ecx = 0x0;
 	t->eax = 0x0;
 	t->eip = (uint32_t) eip;		// 以下由处理器自动压入
-	kprintln("task->eip=%x", t->eip);
+	kprintf("task->eip=%x\r\n", t->eip);
 	t->cs = 0x08;
 	t->eflags = model->eflags;
 	t->useresp = 0x0;//(uint32_t) t;
-	kprintln("task->useresp=%x", t->useresp);
+	kprintf("task->useresp=%x\r\n", t->useresp);
 	t->ss = 0x00;
 }
 
 void dump_task(task_t* regs) {
-	kprintln("Dump task, esp=0x%x", regs);
-	kprintln("ds=0x%x", regs->ds);
-	kprintln("edi=0x%x", regs->edi);
-	kprintln("esi=0x%x", regs->esi);
-	kprintln("ebp=0x%x", regs->ebp);
-	kprintln("esp=0x%x", regs->esp);
-	kprintln("ebx=0x%x", regs->ebx);
-	kprintln("edx=0x%x", regs->edx);
-	kprintln("ecx=0x%x", regs->ecx);
-	kprintln("eax=0x%x", regs->eax);
-	kprintln("eip=0x%x", regs->eip);
-	kprintln("cs=0x%x", regs->cs);
-	kprintln("eflags=0x%x", regs->eflags);
-	kprintln("useresp=0x%x", regs->useresp);
-	kprintln("ss=0x%x", regs->ss);
+	kprintf("Dump task, esp=0x%x\r\n", regs);
+	kprintf("ds=0x%x\r\n", regs->ds);
+	kprintf("edi=0x%x\r\n", regs->edi);
+	kprintf("esi=0x%x\r\n", regs->esi);
+	kprintf("ebp=0x%x\r\n", regs->ebp);
+	kprintf("esp=0x%x\r\n", regs->esp);
+	kprintf("ebx=0x%x\r\n", regs->ebx);
+	kprintf("edx=0x%x\r\n", regs->edx);
+	kprintf("ecx=0x%x\r\n", regs->ecx);
+	kprintf("eax=0x%x\r\n", regs->eax);
+	kprintf("eip=0x%x\r\n", regs->eip);
+	kprintf("cs=0x%x\r\n", regs->cs);
+	kprintf("eflags=0x%x\r\n", regs->eflags);
+	kprintf("useresp=0x%x\r\n", regs->useresp);
+	kprintf("ss=0x%x\r\n", regs->ss);
 }
