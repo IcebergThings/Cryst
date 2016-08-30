@@ -24,12 +24,6 @@
 	#define NULL ((void*) 0)
 #endif
 
-typedef int8_t bool;
-#if !(defined(true) && defined(false))
-	#define true ((bool) 1)
-	#define false ((bool) 0)
-#endif
-
 typedef unsigned long  uint64_t;
 typedef   signed long  int64_t;
 typedef unsigned int   uint32_t;
@@ -40,7 +34,14 @@ typedef unsigned char  uint8_t;
 typedef   signed char  int8_t;
 typedef unsigned int   size_t;
 typedef   signed int   intptr_t;
-typedef unsigned int   intptr_t;
+typedef unsigned int   uintptr_t;
+
+typedef int8_t bool;
+#if !(defined(true) && defined(false))
+	#define true ((bool) 1)
+	#define false ((bool) 0)
+#endif
+
 // 我们的征途是……
 // http://en.cppreference.com/w/c/types/integer
 
