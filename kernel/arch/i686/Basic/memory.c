@@ -62,7 +62,7 @@ void Memory_ReleasePhy(uint32_t page) {
 //---------------------------------------------------------------------------
 uint32_t Memory_SearchFree() {
 	// 反正也用不了lower memory，直接跳过那部分
-	for(uint32_t i = 256; i <= page_count; i++) {
+	for (uint32_t i = 256; i <= page_count; i++) {
 		if (phy_c[i]==0) {
 			return i;
 		}
@@ -74,7 +74,7 @@ uint32_t Memory_SearchFree() {
 // ● 将内存绑定入页表（页计数）
 //---------------------------------------------------------------------------
 void Memory_map_physical_to_page_tab(uint32_t* page_tab, uint8_t flag, uint32_t f, uint32_t t) {
-	for(uint32_t i = f; i < t; i++) {
+	for (uint32_t i = f; i < t; i++) {
 		page_tab[i] = (i * 0x1000) | flag;
 		Memory_AllocPhy(i);
 	}
