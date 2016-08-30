@@ -21,17 +21,15 @@
 
 extern task_t* sttaskb;
 
-volatile void taskb() {
-	for (;;) {
-		kputc('B');
-	}
+void taskb() {
+	for (;;) kputc('B');
 }
 
 volatile char stb[4096];
 
 void create_task(task_t* model, void* stack, void* eip) {
 	kprintf("New task, esp=0x%x\r\n", stack);
-	task_t* t = (task_t*)(stack);
+	task_t* t = (task_t*) stack;
 	t->ds = 0x10;
 	t->edi = 0x0; 	// 从 edi 到 eax 由 pusha 指令压入
 	t->esi = 0x0;

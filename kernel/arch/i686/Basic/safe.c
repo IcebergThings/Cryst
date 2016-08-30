@@ -42,15 +42,16 @@ void fatal_halt() {
 }
 
 void panic(pt_regs* regs) {
-	kprintf("============= KERNEL PANIC =============\r\n");
+	kputs("============= KERNEL PANIC =============");
 	#ifdef DEBUG
 	kprintf("[ Kernel debug enabled\r\n");
 	#endif
 	kprintf("[ Boot Ticks: %d\r\n[ Mills From boot: %d\r\n", tick, millis_from_boot);
-	kprintf("============== TRACE INFO ==============\r\n");
+	kputs("============== TRACE INFO ==============");
+	kputs("TODO: a backtrace needed");
 	// TODO: a backtrace needed
-	kprintf("=============== INFO END ===============\r\n");
-	kprintf("System Halted due to fatal error\r\n");
+	kputs("=============== INFO END ===============");
+	kputs("System Halted due to fatal error");
 
 	// 在遇到这种问题的时候我们需要使用jmp
 	// 这个情况下栈可能是乱的，调用可能不工作

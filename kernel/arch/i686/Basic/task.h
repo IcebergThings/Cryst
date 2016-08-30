@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "Basic/types.h"
+#include "debug.h"
 
 typedef volatile struct _task_t {
 	uint32_t ds;		// 用于保存用户的数据段描述符
@@ -40,7 +41,7 @@ typedef volatile struct _task_t {
 	uint32_t ss;
 } task_t;
 
-extern volatile void taskb();
+extern void taskb();
 extern volatile char stb[4096];
 
 void create_task(task_t* model, void* stack, void* eip);
