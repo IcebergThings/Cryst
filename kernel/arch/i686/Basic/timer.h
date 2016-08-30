@@ -33,6 +33,9 @@
 
 extern uint32_t timer_frequency;
 
+extern uint64_t tick;
+extern uint64_t millis_from_boot;
+
 void Timer_set_frequency(uint32_t frequency);
 extern volatile task_t* timer_callback(task_t *regs);
 

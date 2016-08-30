@@ -19,8 +19,8 @@
 
 #include "Basic/timer.h"
 
-static uint64_t tick = 0;
-static uint64_t millis_from_boot = 0;
+uint64_t tick = 0;
+uint64_t millis_from_boot = 0;
 uint32_t timer_frequency = 0;
 
 static task_t* kernel_regs;
