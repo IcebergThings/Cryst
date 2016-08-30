@@ -86,27 +86,24 @@ extern multiboot_t *glb_mboot_ptr;
 // ● 内存初始化
 //---------------------------------------------------------------------------
 void Init_Memory () {
-
 	// 初始操作
 	upper_mem = glb_mboot_ptr->mem_upper;
 	mem_size = upper_mem + 1024; // Upper memory + Lower (1024KB)
 	page_count = mem_size >> 2;
-	int kernel_end_page = (uint32_t)(&KERNEL_CODE_END) >> 12;
-	int kernel_memory_end_page = kernel_end_page + (page_count >> 12 ) + 1;
+	uint32_t kernel_end_page = (uint32_t) (&KERNEL_CODE_END) >> 12;
+	uint32_t kernel_memory_end_page = kernel_end_page + (page_count >> 12) + 1;
 	phy_c = (uint8_t*) &KERNEL_CODE_END;
 
 	// 初始分页
 	// 将每个entry设置为not present
-	int j;
-	for(j = 0; j < 1024; j++)
-	{
+	for (int j = 0; j < 1024; j++) {
 		// This sets the following flags to the pages:
 		//   Supervisor: Only kernel-mode can access them
 		//   Write Enabled: It can be both read from and written to
 		//   Not Present: The page table is not present
 		page_directory[j] = 0x00000002;
 	}
-	for(uint32_t i = 0; i < page_count; i++) {
+	for (uint32_t i = 0; i < page_count; i++) {
 		phy_c[i] = 4;
 	}
 	phy_c[page_count + 1] = 0; // For safe
@@ -114,17 +111,17 @@ void Init_Memory () {
 	// holds the physical address where we want to start mapping these pages to.
 	// in this case, we want to map these pages to the very beginning of memory.
 	// 第一页不映射，这样能捕捉NULL指针
-	for(uint32_t i = 1; i < kernel_memory_end_page; i++) {
+	for (uint32_t i = 1; i < kernel_memory_end_page; i++) {
 		// As the address is page aligned, it will always leave 12 bits zeroed.
 		// Those bits are used by the attributes ;)
 		kern_page_table[i] = (i << 12) | SL_RW_P;
 	}
-	for(uint32_t i = 0; i < kernel_memory_end_page; i++) {
+	for (uint32_t i = 0; i < kernel_memory_end_page; i++) {
 		phy_c[i] = 0;
 	}
 
 	// Put the Page Table in the Page Directory
-	Memory_map_pages_to_dir(0, (uint32_t*)kern_page_table, SL_RW_P);
+	Memory_map_pages_to_dir(0, (uint32_t*) kern_page_table, SL_RW_P);
 
 	// 启用
 	asm volatile ("movl %%eax, %%cr3" :: "a" (&page_directory)); // load PDPT into CR3
