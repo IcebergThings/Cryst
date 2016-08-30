@@ -24,7 +24,6 @@
 #include "config.h"
 
 char* itoa(int value, char* result, int base);
-
-//volatile void memcpy(void *dest, void *src, size_t n);
+void memcpy(void* dest, void* src, size_t n);
 
 #endif

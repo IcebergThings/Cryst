@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "Basic/types.h"
+#include "debug.h"
 
 typedef volatile struct _task_t {
 	uint32_t ds;		// 用于保存用户的数据段描述符
