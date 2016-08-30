@@ -35,36 +35,70 @@ extern void isr17(); 		// 17 #AC 对齐检查
 extern void isr18(); 		// 18 #MC 机器检查
 extern void isr19(); 		// 19 #XM SIMD(单指令多数据)浮点异常*/
 
+// Emergent stop
+void fatal_halt() {
+	__asm__ volatile ("cli");
+	for (;;) __asm__ volatile ("hlt");
+}
+
+void panic(pt_regs* regs) {
+	kprintf("============= KERNEL PANIC =============\r\n");
+	#ifdef DEBUG
+	kprintf("[ Kernel debug enabled\r\n");
+	#endif
+	kprintf("[ Boot Ticks: %d\r\n[ Mills From boot: %d\r\n", tick, millis_from_boot);
+	kprintf("============== TRACE INFO ==============\r\n");
+	// TODO: a backtrace needed
+	kprintf("=============== INFO END ===============\r\n");
+	kprintf("System Halted due to fatal error\r\n");
+
+	// 在遇到这种问题的时候我们需要使用jmp
+	// 这个情况下栈可能是乱的，调用可能不工作
+	__asm__ volatile ("jmp fatal_halt");
+}
+
+static void cs_assert(pt_regs* regs) {
+	if (regs->cs == 0x08) { // This is the kernel CS
+		// TODO: 理论上这里要设定一个应急栈
+
+		panic(regs);
+	}
+}
+
 // #DE 除 0 异常
 static void isr0_handler(pt_regs *regs) {
 	kprintf("Divide by 0 - #DE, at EIP=0x%x\r\n", regs->eip);
+	cs_assert(regs);
 }
 
 // #UD 无效或未定义的操作码
 static void isr6_handler(pt_regs *regs) {
 	kprintf("Undefined - #UD, at EIP=0x%x\r\n", regs->eip);
-
-	io_cpu_hlt();
+	cs_assert(regs);
 }
 
 // #SS 栈错误(有错误代码)
 static void isr12_handler(pt_regs *regs) {
 	kprintf("Stack Error - #SS, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
+	cs_assert(regs);
 }
 
 // #GP 常规保护(有错误代码)
 static void isr13_handler(pt_regs *regs) {
 	kprintf("General Protection - #GP, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
+	cs_assert(regs);
 }
 
 // #PF 页故障(有错误代码)
 static void isr14_handler(pt_regs *regs) {
 	kprintf("Page fault - #PF, ERR CODE=0x%x, at EIP=0x%x\r\n", regs->err_code, regs->eip);
+	cs_assert(regs);
 }
 
 // #MF 浮点处理单元错误
 static void isr16_handler(pt_regs *regs) {
 	kprintf("Float Fault - #MF, at EIP=0x%x\r\n", regs->eip);
+	cs_assert(regs);
 }
 
 void Init_Safe() {

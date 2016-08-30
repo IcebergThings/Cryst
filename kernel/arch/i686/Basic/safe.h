@@ -21,11 +21,15 @@
 #define INCLUDE_SAFE_H
 
 #include "Basic/idt.h"
+#include "Basic/timer.h"
 #include "config.h"
 
 #ifdef DEBUG
 #include "Basic/debug.h"
 #endif
+
+extern void fatal_halt();
+extern void panic(pt_regs* regs);
 
 void Init_Safe();
 
