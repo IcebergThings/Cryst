@@ -27,14 +27,14 @@ void taskb() {
 
 volatile char stb[4096];
 
-void create_task(task_t* model, void* stack, void* eip) {
-	kprintf("New task, esp=0x%x\r\n", stack);
-	task_t* t = (task_t*) stack;
-	t->ds = 0x10;
+volatile void create_task(task_t* model, void* stack_top, void* eip) {
+	kprintf("New task, esp=0x%x\r\n", stack_top);
+	volatile task_t* t = (task_t*) (stack_top - sizeof(task_t));
+	t->ds = model->ds;
 	t->edi = 0x0; 	// 从 edi 到 eax 由 pusha 指令压入
 	t->esi = 0x0;
 	t->ebp = 0x0;
-	t->esp = (uint32_t) t + 24;
+	t->esp = (uint32_t) t - 20;
 	kprintf("task->esp=%x\r\n", t->esp);
 	t->ebx = 0x0;
 	t->edx = 0x0;
@@ -42,11 +42,11 @@ void create_task(task_t* model, void* stack, void* eip) {
 	t->eax = 0x0;
 	t->eip = (uint32_t) eip;		// 以下由处理器自动压入
 	kprintf("task->eip=%x\r\n", t->eip);
-	t->cs = 0x08;
+	t->cs = model->cs;
 	t->eflags = model->eflags;
-	t->useresp = 0x0;//(uint32_t) t;
+	t->useresp = stack_top;
 	kprintf("task->useresp=%x\r\n", t->useresp);
-	t->ss = 0x00;
+	t->ss = model->ss;
 }
 
 void dump_task(task_t* regs) {

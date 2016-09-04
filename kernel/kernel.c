@@ -67,6 +67,7 @@ void arch_init () {
 //---------------------------------------------------------------------------
 void idle () {
 //	asm volatile ("UD2");
+//	create_task();
 	for (;;) {
 		kputc('A');
 //		io_cpu_hlt ();	// 挂起

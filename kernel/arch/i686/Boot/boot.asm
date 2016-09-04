@@ -67,7 +67,7 @@ _start:
 														; 所以必须关闭中断
 	mov esp, STACK_TOP				; 设置内核栈地址
 	mov ebp, 0								; 帧指针修改为 0
-	and esp, 0xFFFFFF					; 栈地址按照16字节对齐
+;	and esp, 0xFFFFFF					; 栈地址按照16字节对齐
 	mov [glb_mboot_ptr], ebx 	; 将 ebx 中存储的指针存入全局变量
 
 .fpu_probe:
