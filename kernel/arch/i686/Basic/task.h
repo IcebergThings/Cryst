@@ -43,8 +43,13 @@ typedef volatile struct _task_t {
 
 extern void taskb();
 extern volatile char stb[4096];
+extern volatile void* stb_st;
 
-volatile void create_task(task_t* model, void* stack_top, void* eip);
+extern void taska();
+extern volatile char sta[4096];
+extern volatile void* sta_st;
+
+void create_task(task_t* model, void* stack_top, void* eip);
 
 void dump_task(task_t* regs);
 

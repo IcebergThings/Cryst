@@ -26,8 +26,17 @@ void taskb() {
 }
 
 volatile char stb[4096];
+volatile void* stb_st;
 
-volatile void create_task(task_t* model, void* stack_top, void* eip) {
+void taska() {
+	for (;;) kputc('A');
+}
+
+volatile char sta[4096];
+volatile void* sta_st;
+
+
+void create_task(task_t* model, void* stack_top, void* eip) {
 	kprintf("New task, esp=0x%x\r\n", stack_top);
 	volatile task_t* t = (task_t*) (stack_top - sizeof(task_t));
 	t->ds = model->ds;

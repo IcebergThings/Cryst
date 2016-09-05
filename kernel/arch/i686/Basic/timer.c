@@ -29,7 +29,8 @@ static task_t* kernel_regs;
 // ● 时钟信号处理函数
 //---------------------------------------------------------------------------
 //#define TIMER_VERBOSE_TICKS
-bool a;
+bool a,b ;
+intptr_t ptra, ptrb;
 volatile task_t* timer_callback(task_t *regs) {
 	tick++;
 	millis_from_boot += 1000 / timer_frequency;
@@ -42,14 +43,26 @@ volatile task_t* timer_callback(task_t *regs) {
 
 	io_out8(0x20, 0x20); //重设时钟中断
 
-	if (regs->ds == 0x10) kernel_regs = regs; //更新内核regs
-
 	volatile task_t* oregs = regs;
 	if (a) {
-		create_task(kernel_regs, stb + 4096, taskb);
+		create_task(regs, stb + 4096, taskb);
+		create_task(regs, sta + 4096, taska);
 		a = false;
-		oregs = stb + 4096 - sizeof(task_t);
+
+		ptra = sta + 4096 - sizeof(task_t);
+		ptrb = stb + 4096 - sizeof(task_t);
+
+		oregs = ptra;
+
+	} else if (!b) {
+		ptra = regs;
+		oregs = ptrb;
+	} else {
+		ptrb = regs;
+		oregs = ptra;
 	}
+	b=!b;
+//
 
 	return oregs;
 }
@@ -74,6 +87,7 @@ void Timer_set_frequency(uint32_t frequency) {
 //---------------------------------------------------------------------------
 void Init_Timer(uint32_t frequency) {
 	a=true;
+	b=true;
 	// 注册时间相关的处理函数
 	//idt_register_interrupt_handler(IRQ0, timer_callback); // Deprecated
 	// Now timer has dedicated function implementation
