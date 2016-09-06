@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "Basic/types.h"
+#include "Basic/memory.h"
 #include "debug.h"
 
 typedef volatile struct _task_t {
@@ -40,6 +41,15 @@ typedef volatile struct _task_t {
 	uint32_t useresp;
 	uint32_t ss;
 } task_t;
+
+typedef volatile struct _task_node {
+	struct _task_node* prev;
+	task_t* ptr;
+	bool meta;		// meta = true表示当前node是一个空进程（标志用进程）
+	struct _task_node* next;
+} task_node;
+
+extern task_node* current;
 
 extern void taskb();
 extern volatile char stb[4096];

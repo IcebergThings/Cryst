@@ -58,6 +58,21 @@ void panic(pt_regs* regs) {
 	__asm__ volatile ("jmp fatal_halt");
 }
 
+void panic_text(char* str) {
+	kputs("============= KERNEL PANIC =============");
+	#ifdef DEBUG
+	kprintf("[ Kernel debug enabled\r\n");
+	#endif
+	kprintf("[ Boot Ticks: %d\r\n[ Mills From boot: %d\r\n", tick, millis_from_boot);
+	kputs(str);
+	kputs("=============== INFO END ===============");
+	kputs("System Halted due to fatal error");
+
+	// 在遇到这种问题的时候我们需要使用jmp
+	// 这个情况下栈可能是乱的，调用可能不工作
+	__asm__ volatile ("jmp fatal_halt");
+}
+
 static void cs_assert(pt_regs* regs) {
 	if (regs->cs == 0x08) { // This is the kernel CS
 		// TODO: 理论上这里要设定一个应急栈

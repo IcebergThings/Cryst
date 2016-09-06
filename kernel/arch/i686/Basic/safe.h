@@ -30,6 +30,7 @@
 
 extern void fatal_halt();
 extern void panic(pt_regs* regs);
+extern void panic_text(char* str);
 
 void Init_Safe();
 
