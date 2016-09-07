@@ -39,12 +39,9 @@ task_node* current;
 task_node tska, tskb;
 
 void create_process() {
-	// Allocation is kind of crappy now..
+	// Allocation is kind of crappy now.
 	uint32_t phy_p = Memory_SearchFree();
 	if (!Memory_AllocPhy(phy_p)) panic_text("Can not assign memory to create process!");
-
-
-
 }
 
 void insert_node(void* stack_top, task_node* dst) {
@@ -53,7 +50,7 @@ void insert_node(void* stack_top, task_node* dst) {
 	current->next = dst;
 
 	dst->meta = false;
-	dst->ptr = (task_t*)stack_top;
+	dst->ptr = (task_t*) stack_top;
 }
 
 void create_task(task_t* model, void* stack_top, void* eip) {
